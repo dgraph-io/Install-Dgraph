@@ -104,7 +104,7 @@ printf $RESET
 	fi
 
 	print_step "Inflating binaries (password may be required).";
-	$sudo_cmd tar -C /usr/local/bin -xzf /tmp/$tar_file;
+	$sudo_cmd tar -C /usr/local/bin -xzf /tmp/$tar_file --strip-components=1;
 	rm "/tmp/"$tar_file;
 
 	# Check installation
