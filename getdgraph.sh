@@ -21,6 +21,11 @@ BLACK='\033[30;1m'
 RED='\033[91;1m'
 GREEN='\033[32;1m'
 RESET='\033[0m'
+WHITE='\033[97:1m'
+
+print_instruction() {
+    printf "$WHITE$1$RESET\n"
+}
 
 print_step() {
     printf "$BLACK$1$RESET\n"
@@ -110,14 +115,20 @@ printf $RESET
 	# Check installation
 	if hash dgraph 2>/dev/null; then
 		print_good "Dgraph binaries $release_version have been installed successfully in /usr/local/bin.";
-		print_good "Please visit https://wiki.dgraph.io/Beginners_Guide for further instructions on usage."
-		echo
-		echo
-		exit 0;
 	else
 		print_error "Installation failed. Please try again.";
 		exit 1;
 	fi
+
+	print_step "Downloading ICU data file.";
+	wget https://github.com/dgraph-io/goicu/raw/master/icudt58l.dat -P /tmp;
+	$sudo_cmd mv /tmp/icudt58l.dat /usr/local/share/
+	print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
+	print_instruction "To use all the features of Dgraph, export the ICU_DATA variable like"
+	print_instruction "echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.bashrc"
+	print_good "Please visit https://wiki.dgraph.io/Beginners_Guide for further instructions on usage."
+	echo
+	echo
 }
 
 install_dgraph "$@"
