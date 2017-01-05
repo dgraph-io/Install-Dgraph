@@ -93,7 +93,7 @@ printf $RESET
 
 	print_step "Comparing checksums for dgraph binaries"
 
-	if $md5cmd /usr/local/bin/dgraph && $md5cmd /usr/local/bin/dgraphloader; then
+	if $md5cmd /usr/local/bin/dgraph &>/dev/null && $md5cmd /usr/local/bin/dgraphloader &>/dev/null; then
 		dgraphsum=$($md5cmd /usr/local/bin/dgraph | awk '{print $1;}')
 		dgraphloadersum=$($md5cmd /usr/local/bin/dgraphloader | awk '{print $1;}')
 	else
@@ -158,7 +158,7 @@ printf $RESET
 
 	icufile="icudt58l.dat"
 	iculoc="/usr/local/share/$icufile"
-	if $md5cmd $iculoc; then
+	if $md5cmd $iculoc &>/dev/null; then
 		icusum=$($md5cmd $iculoc | awk '{print $1;}')
 	else
 		icusum=""
