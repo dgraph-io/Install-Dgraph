@@ -156,8 +156,10 @@ printf $RESET
 
 	icu=$(sed '3q;d' /tmp/$checksum_file | awk '{print $1;}')
 
-	if $md5cmd /usr/local/share/icudt58l.dat; then
-		icusum=$($md5cmd /usr/local/share/icudt58l.dat | awk '{print $1;}')
+	icufile="icudt58l.dat"
+	iculoc="/usr/local/share/$icufile"
+	if $md5cmd $iculoc; then
+		icusum=$($md5cmd $iculoc | awk '{print $1;}')
 	else
 		icusum=""
 	fi
@@ -165,13 +167,19 @@ printf $RESET
 	if [ "$icu" == "$icusum" ]; then
 		print_good "You already have the ICU data file for v58.2."
 	else
+		if [ -f $iculoc ]; then
+			$sudo_cmd rm $iculoc
+		fi
 		print_step "Downloading ICU data file.";
-		wget https://github.com/dgraph-io/goicu/raw/master/icudt58l.dat -P /tmp;
-		$sudo_cmd mv /tmp/icudt58l.dat /usr/local/share/
+		wget https://github.com/dgraph-io/goicu/raw/master/$icufile -P /tmp;
+		$sudo_cmd mv /tmp/$icufile /usr/local/share/
 		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
+	fi
+
+	if [ "$ICU_DATA" != "$iculoc" ]; then
 		print_instruction "To use the indexing features of Dgraph, export the ICU_DATA variable to your ~/.bashrc or ~/.zshrc."
 		echo
-		print_instruction "echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.bashrc"
+		print_instruction "echo \"export ICU_DATA=$iculoc\" >> ~/.bashrc"
 		echo
 	fi
 	print_good "Please visit https://wiki.dgraph.io/Beginners_Guide for further instructions on usage."
