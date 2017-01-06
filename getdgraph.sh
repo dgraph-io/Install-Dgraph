@@ -182,7 +182,7 @@ printf $RESET
 		print_instruction "echo \"export ICU_DATA=$iculoc\" >> ~/.bashrc"
 		echo
 	fi
-	print_good "Please visit https://wiki.dgraph.io/Beginners_Guide for further instructions on usage."
+	print_good "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
 	echo
 	echo
 }
