@@ -3,15 +3,13 @@
 #                  Dgraph Installer Script
 #
 #   Homepage: https://dgraph.io
-#   Requires: bash, curl or wget, tar or unzip
+#   Requires: bash, curl, tar or unzip
 #
 # Hello! This is a script that installs Dgraph
 # into your PATH (which may require password authorization).
 # Use it like this:
 #
 #	$ curl https://get.dgraph.io | bash
-#	 or
-#	$ wget -qO- https://get.dgraph.io | bash
 #
 # This should work on Mac, Linux, and BSD systems.
 
@@ -55,6 +53,12 @@ cat << "EOF"
 EOF
 printf $RESET
 
+	# Check curl is installed
+	if ! hash curl 2>/dev/null; then
+		print_error "Could not find curl. Please install curl and try again.";
+		exit 1;
+	fi
+
 	sudo_cmd=""
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
@@ -62,14 +66,7 @@ printf $RESET
 
 	install_path="/usr/local/bin"
 
-	if hash curl 2>/dev/null; then
-		release_version="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:].\n\r' | head -n1)"
-	elif hash wget 2>/dev/null; then
-		release_version="$(wget -qO- 2>&1 https://api.github.com/repos/dgraph-io/dgraph/releases | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:].\n\r' | head -n1)"
-	else
-		print_error "Please install wget or curl to continue."
-		exit 1
-	fi
+	release_version="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:].\n\r' | head -n1)"
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
 	if [ "$platform" = "linux" ]; then
@@ -77,10 +74,11 @@ printf $RESET
 	else
 		md5cmd="md5 -r"
 	fi
+
 	checksum_file="dgraph-checksum-$platform-amd64-$release_version".md5
 	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$checksum_file
 	print_step "Downloading checksum file."
-	if wget --progress=bar "$checksum_link" -O "/tmp/$checksum_file"; then
+	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_good "Download complete."
 	else
 		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide"
@@ -88,8 +86,8 @@ printf $RESET
 		exit 1;
 	fi
 
-	dgraph=$(sed '1q;d' /tmp/$checksum_file | awk '{print $1;}')
-	dgraphloader=$(sed '2q;d' /tmp/$checksum_file | awk '{print $1;}')
+	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | awk '{print $1;}')
+	dgraphloader=$(grep -m 1 /usr/local/bin/dgraphloader  /tmp/$checksum_file | awk '{print $1;}')
 
 	print_step "Comparing checksums for dgraph binaries"
 
@@ -117,28 +115,14 @@ printf $RESET
 		fi
 
 		# Download and untar Dgraph binaries
-		if hash wget 2>/dev/null; then
+		if curl --output /dev/null --silent --head --fail "$dgraph_link"; then
 			print_step "Downloading $dgraph_link"
-			if wget --progress=bar "$dgraph_link" -O "/tmp/$tar_file"; then
-				print_good "Download complete."
-			else
-				print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide"
-				echo
-				exit 1;
-			fi
-		elif hash curl 2>/dev/null; then
-			if curl --output /dev/null --silent --head --fail "$dgraph_link"; then
-				print_step "Downloading $dgraph_link"
-				curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
-				print_good "Download complete."
-			else
-				print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide";
-				echo
-				exit 1;
-			fi
+			curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
+			print_good "Download complete."
 		else
-			print_error "Could not find curl or wget.";
-			exit 1 ;
+			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide";
+			echo
+			exit 1;
 		fi
 
 		print_step "Inflating binaries (password may be required).";
@@ -154,7 +138,7 @@ printf $RESET
 		fi
 	fi
 
-	icu=$(sed '3q;d' /tmp/$checksum_file | awk '{print $1;}')
+	icu=$(grep -m 1 /icudt58l.dat  /tmp/$checksum_file | awk '{print $1;}')
 
 	icufile="icudt58l.dat"
 	iculoc="/usr/local/share/$icufile"
@@ -171,7 +155,7 @@ printf $RESET
 			$sudo_cmd rm $iculoc
 		fi
 		print_step "Downloading ICU data file.";
-		wget https://github.com/dgraph-io/goicu/raw/master/$icufile -P /tmp;
+		curl -L --progress-bar https://github.com/dgraph-io/dgraph/releases/download/$release_version/$icufile -o /tmp/$icufile;
 		$sudo_cmd mv /tmp/$icufile /usr/local/share/
 		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
 	fi
