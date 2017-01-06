@@ -160,15 +160,18 @@ printf $RESET
 		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
 	fi
 
-	if [ "$ICU_DATA" != "$iculoc" ]; then
-		print_instruction "To use the indexing features of Dgraph, export the ICU_DATA variable to your ~/.bashrc or ~/.zshrc."
-		echo
-		print_instruction "echo \"export ICU_DATA=$iculoc\" >> ~/.bashrc"
-		echo
-	fi
 	print_good "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
-	echo
-	echo
+	if [ "$ICU_DATA" != "$iculoc" ]; then
+echo "
+##########################################   IMPORTANT  #################################################
+#                                                                                                       #
+#  To use the indexing features of Dgraph, export the ICU_DATA variable to your ~/.bashrc or ~/.zshrc. 	#
+#                                                                                                       #
+#  echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.bashrc                                    #
+#                                                                                                       #
+#########################################################################################################
+"
+	fi
 }
 
 install_dgraph "$@"
