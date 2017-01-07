@@ -39,7 +39,7 @@ print_good() {
 
 install_dgraph() {
 
-printf $GREEN
+printf $BLACK
 cat << "EOF"
   _____                        _
  |  __ \                      | |
@@ -67,6 +67,7 @@ printf $RESET
 	install_path="/usr/local/bin"
 
 	release_version="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:].\n\r' | head -n1)"
+	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
 	if [ "$platform" = "linux" ]; then
@@ -79,7 +80,7 @@ printf $RESET
 	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$checksum_file
 	print_step "Downloading checksum file."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
-		print_good "Download complete."
+		print_step "Download complete."
 	else
 		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide"
 		echo
@@ -100,7 +101,7 @@ printf $RESET
 	fi
 
 	if [ "$dgraph" == "$dgraphsum" ] && [ "$dgraphloader" == "$dgraphloadersum" ]; then
-		print_good "You already have latest version of Dgraph binary installed."
+		print_good "You already have Dgraph $release_version installed."
 	else
 		tar_file=dgraph-$platform-amd64-$release_version".tar.gz"
 		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$tar_file
@@ -149,7 +150,7 @@ printf $RESET
 	fi
 
 	if [ "$icu" == "$icusum" ]; then
-		print_good "You already have the ICU data file for v58.2."
+		print_good "You already have ICU v58.2 data file."
 	else
 		if [ -f $iculoc ]; then
 			$sudo_cmd rm $iculoc
@@ -160,18 +161,22 @@ printf $RESET
 		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
 	fi
 
-	print_good "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
 	if [ "$ICU_DATA" != "$iculoc" ]; then
-echo "
-##########################################   IMPORTANT  #################################################
+print_error "
+###########################################  IMPORTANT  #################################################
 #                                                                                                       #
+#  You do not have ICU_DATA environment variable set.                                                   #
 #  To use the indexing features of Dgraph, export the ICU_DATA variable to your ~/.bashrc or ~/.zshrc. 	#
 #                                                                                                       #
 #  echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.bashrc                                    #
+#  echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.zshrc                                     #
 #                                                                                                       #
 #########################################################################################################
 "
+	else
+		print_good "You already have ICU_DATA environment variable correctly set."
 	fi
+	print_instruction "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
 }
 
 install_dgraph "$@"
