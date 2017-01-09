@@ -111,7 +111,7 @@ printf $RESET
 			dgraph_path="$(which dgraph)"
 			dgraph_backup="dgraph_backup_olderversion"
 			print_step "Backing up older versions in ~/$dgraph_backup (password may be required)."
-			mkdir -p ~/$dgraph_backp
+			mkdir -p ~/$dgraph_backup
 			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
 		fi
 
