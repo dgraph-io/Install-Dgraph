@@ -70,13 +70,16 @@ printf $RESET
 	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
-	if [ "$platform" = "linux" ]; then
-		md5cmd=md5sum
+
+	digest_cmd=""
+	if hash shasum 2>/dev/null; then
+	  digest_cmd="shasum -a 256"
 	else
-		md5cmd="md5 -r"
+	  print_error "Could not find shasum. Please install shasum and try again.";
+	  exit 1
 	fi
 
-	checksum_file="dgraph-checksum-$platform-amd64-$release_version".md5
+	checksum_file="dgraph-checksum-$platform-amd64-$release_version".sha256
 	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$checksum_file
 	print_step "Downloading checksum file."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
@@ -92,9 +95,9 @@ printf $RESET
 
 	print_step "Comparing checksums for dgraph binaries"
 
-	if $md5cmd /usr/local/bin/dgraph &>/dev/null && $md5cmd /usr/local/bin/dgraphloader &>/dev/null; then
-		dgraphsum=$($md5cmd /usr/local/bin/dgraph | awk '{print $1;}')
-		dgraphloadersum=$($md5cmd /usr/local/bin/dgraphloader | awk '{print $1;}')
+	if $digest_cmd /usr/local/bin/dgraph &>/dev/null && $digest_cmd /usr/local/bin/dgraphloader &>/dev/null; then
+		dgraphsum=$($digest_cmd /usr/local/bin/dgraph | awk '{print $1;}')
+		dgraphloadersum=$($digest_cmd /usr/local/bin/dgraphloader | awk '{print $1;}')
 	else
 		dgraphsum=""
 		dgraphloadersum=""
@@ -143,8 +146,8 @@ printf $RESET
 
 	icufile="icudt58l.dat"
 	iculoc="/usr/local/share/$icufile"
-	if $md5cmd $iculoc &>/dev/null; then
-		icusum=$($md5cmd $iculoc | awk '{print $1;}')
+	if $digest_cmd $iculoc &>/dev/null; then
+		icusum=$($digest_cmd $iculoc | awk '{print $1;}')
 	else
 		icusum=""
 	fi
