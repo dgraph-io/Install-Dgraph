@@ -161,21 +161,6 @@ printf $RESET
 		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
 	fi
 
-	if [ "$ICU_DATA" != "$iculoc" ]; then
-print_error "
-###########################################  IMPORTANT  #################################################
-#                                                                                                       #
-#  You do not have ICU_DATA environment variable set.                                                   #
-#  To use the indexing features of Dgraph, export the ICU_DATA variable to your ~/.bashrc or ~/.zshrc. 	#
-#                                                                                                       #
-#  echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.bashrc                                    #
-#  echo \"export ICU_DATA=/usr/local/share/icudt58l.dat\" >> ~/.zshrc                                     #
-#                                                                                                       #
-#########################################################################################################
-"
-	else
-		print_good "You already have ICU_DATA environment variable correctly set."
-	fi
 	print_instruction "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
 }
 
