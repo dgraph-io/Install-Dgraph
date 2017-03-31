@@ -142,28 +142,6 @@ printf $RESET
 		fi
 	fi
 
-	icu=$(grep -m 1 /icudt58l.dat  /tmp/$checksum_file | awk '{print $1;}')
-
-	icufile="icudt58l.dat"
-	iculoc="/usr/local/share/$icufile"
-	if $digest_cmd $iculoc &>/dev/null; then
-		icusum=$($digest_cmd $iculoc | awk '{print $1;}')
-	else
-		icusum=""
-	fi
-
-	if [ "$icu" == "$icusum" ]; then
-		print_good "You already have ICU v58.2 data file."
-	else
-		if [ -f $iculoc ]; then
-			$sudo_cmd rm $iculoc
-		fi
-		print_step "Downloading ICU data file.";
-		curl -L --progress-bar https://github.com/dgraph-io/dgraph/releases/download/$release_version/$icufile -o /tmp/$icufile;
-		$sudo_cmd mv /tmp/$icufile /usr/local/share/
-		print_good "ICU data file for v58.2 has been downloaded and put in /usr/local/share.";
-	fi
-
 	assets=$(grep -m 1 assets.tar.gz  /tmp/$checksum_file | awk '{print $1;}')
 
 	assetsFile="assets.tar.gz"
@@ -178,9 +156,8 @@ printf $RESET
 	if [ "$assets" == "$assetsSum" ]; then
 		print_good "You have the latest assets files."
 	else
-		if [ -d $assetsTarLoc ]; then
-			$sudo_cmd rm $assetsTarLoc
-			$sudo_cmd rm $assetsLoc
+		if [ -d $assetsLoc ] ; then
+			$sudo_cmd rm -r $assetsLoc
 		fi
 		print_step "Downloading assets.";
 		curl -L --progress-bar https://github.com/dgraph-io/dgraph/releases/download/$release_version/$assetsFile -o /tmp/$assetsFile;
@@ -190,7 +167,7 @@ printf $RESET
 		print_good "Assets has been downloaded and put in /usr/local/share/dgraph.";
 	fi
 
-	print_instruction "Please visit https://wiki.dgraph.io/Get_Started for further instructions on usage."
+	print_instruction "Please visit https://docs.dgraph.io/$release_version/get-started for further instructions on usage."
 }
 
 function exit_error {
