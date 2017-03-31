@@ -85,7 +85,7 @@ printf $RESET
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
 	else
-		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide"
+		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io"
 		echo
 		exit 1;
 	fi
@@ -124,7 +124,7 @@ printf $RESET
 			curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
 			print_good "Download complete."
 		else
-			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://wiki.dgraph.io/Beginners_Guide";
+			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io";
 			echo
 			exit 1;
 		fi
@@ -164,7 +164,7 @@ printf $RESET
 		$sudo_cmd mkdir -p /usr/local/share/dgraph /usr/local/share/dgraph/assets
 		$sudo_cmd mv /tmp/$assetsFile /usr/local/share/dgraph
 		$sudo_cmd tar -xzf $assetsTarLoc -C /usr/local/share/dgraph/assets
-		print_good "Assets has been downloaded and put in /usr/local/share/dgraph.";
+		print_good "Assets have been downloaded and put in /usr/local/share/dgraph.";
 	fi
 
 	print_instruction "Please visit https://docs.dgraph.io/$release_version/get-started for further instructions on usage."
