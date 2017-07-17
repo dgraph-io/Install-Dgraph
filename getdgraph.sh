@@ -169,7 +169,7 @@ printf $RESET
 		print_good "Assets have been downloaded and put in /usr/local/share/dgraph.";
 	fi
 
-	print_instruction "Please visit https://docs.dgraph.io/$release_version/get-started for further instructions on usage."
+	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
 }
 
 function exit_error {
