@@ -66,7 +66,7 @@ printf $RESET
 
 	install_path="/usr/local/bin"
 
-	release_version="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
+	release_version="$(curl -s https://get.dgraph.io/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
 	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
