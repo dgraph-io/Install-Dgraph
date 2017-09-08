@@ -94,6 +94,11 @@ printf $RESET
 
 	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | awk '{print $1;}')
 	dgraphloader=$(grep -m 1 /usr/local/bin/dgraphloader  /tmp/$checksum_file | awk '{print $1;}')
+	
+	if [ "$dgraph" == "" ]; then
+	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
+	     exit 1;
+	fi
 
 	print_step "Comparing checksums for dgraph binaries"
 
