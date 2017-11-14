@@ -93,7 +93,6 @@ printf $RESET
 	fi
 
 	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | awk '{print $1;}')
-	dgraphloader=$(grep -m 1 /usr/local/bin/dgraphloader  /tmp/$checksum_file | awk '{print $1;}')
 	
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
@@ -102,15 +101,13 @@ printf $RESET
 
 	print_step "Comparing checksums for dgraph binaries"
 
-	if $digest_cmd /usr/local/bin/dgraph &>/dev/null && $digest_cmd /usr/local/bin/dgraphloader &>/dev/null; then
+	if $digest_cmd /usr/local/bin/dgraph &>/dev/null; then
 		dgraphsum=$($digest_cmd /usr/local/bin/dgraph | awk '{print $1;}')
-		dgraphloadersum=$($digest_cmd /usr/local/bin/dgraphloader | awk '{print $1;}')
 	else
 		dgraphsum=""
-		dgraphloadersum=""
 	fi
 
-	if [ "$dgraph" == "$dgraphsum" ] && [ "$dgraphloader" == "$dgraphloadersum" ]; then
+	if [ "$dgraph" == "$dgraphsum" ]; then
 		print_good "You already have Dgraph $release_version installed."
 	else
 		tar_file=dgraph-$platform-amd64-$release_version".tar.gz"
@@ -137,7 +134,7 @@ printf $RESET
 		fi
 
 		print_step "Inflating binaries (password may be required).";
-		$sudo_cmd tar -C /usr/local/bin -xzf /tmp/$tar_file --strip-components=1;
+		$sudo_cmd tar -C /usr/local/bin -xzf /tmp/$tar_file;
 		rm "/tmp/"$tar_file;
 
 		# Check installation
