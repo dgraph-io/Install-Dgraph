@@ -146,31 +146,6 @@ printf $RESET
 		fi
 	fi
 
-	assets=$(grep -m 1 assets.tar.gz  /tmp/$checksum_file | awk '{print $1;}')
-
-	assetsFile="assets.tar.gz"
-	assetsTarLoc="/usr/local/share/dgraph/assets.tar.gz"
-	assetsLoc="/usr/local/share/dgraph/assets"
-	if $digest_cmd $assetsTarLoc &>/dev/null; then
-		assetsSum=$($digest_cmd $assetsTarLoc | awk '{print $1;}')
-	else
-		assetsSum=""
-	fi
-
-	if [ "$assets" == "$assetsSum" ]; then
-		print_good "You have the latest assets files."
-	else
-		if [ -d $assetsLoc ] ; then
-			$sudo_cmd rm -r $assetsLoc
-		fi
-		print_step "Downloading assets.";
-		curl -L --progress-bar https://github.com/dgraph-io/dgraph/releases/download/$release_version/$assetsFile -o /tmp/$assetsFile;
-		$sudo_cmd mkdir -p /usr/local/share/dgraph /usr/local/share/dgraph/assets
-		$sudo_cmd mv /tmp/$assetsFile /usr/local/share/dgraph
-		$sudo_cmd tar -xzf $assetsTarLoc -C /usr/local/share/dgraph/assets
-		print_good "Assets have been downloaded and put in /usr/local/share/dgraph.";
-	fi
-
 	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
 }
 
