@@ -87,13 +87,13 @@ printf $RESET
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
 	else
-		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io"
+		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io/deploy/#building-from-source"
 		echo
 		exit 1;
 	fi
 
 	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | awk '{print $1;}')
-	
+
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
 	     exit 1;
@@ -128,7 +128,7 @@ printf $RESET
 			curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
 			print_good "Download complete."
 		else
-			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io";
+			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io/deploy/#building-from-source"
 			echo
 			exit 1;
 		fi
