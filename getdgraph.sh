@@ -58,7 +58,6 @@ printf $RESET
 		print_error "Could not find curl. Please install curl and try again.";
 		exit 1;
 	fi
-
 	sudo_cmd=""
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
@@ -81,9 +80,18 @@ printf $RESET
 	  exit 1
 	fi
 
-	checksum_file="dgraph-checksum-$platform-amd64-$release_version".sha256
-	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$checksum_file
-	print_step "Downloading checksum file."
+	if [ "$1" == "" ]; then
+		tag=$release_version
+	elif [ "$1" == "nightly" ]; then
+		tag="nightly"
+	else
+		print_error "Invalid argument "$1"."
+		exit 1
+	fi
+
+	checksum_file="dgraph-checksum-$platform-amd64".sha256
+	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$checksum_file
+	print_step "Downloading checksum file for ${tag} build."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
 	else
@@ -108,19 +116,10 @@ printf $RESET
 	fi
 
 	if [ "$dgraph" == "$dgraphsum" ]; then
-		print_good "You already have Dgraph $release_version installed."
+		print_good "You already have Dgraph $tag installed."
 	else
-		tar_file=dgraph-$platform-amd64-$release_version".tar.gz"
-		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$tar_file
-
-		# Backup existing dgraph binaries in HOME directory
-		if hash dgraph 2>/dev/null; then
-			dgraph_path="$(which dgraph)"
-			dgraph_backup="dgraph_backup_olderversion"
-			print_step "Backing up older versions in ~/$dgraph_backup (password may be required)."
-			mkdir -p ~/$dgraph_backup
-			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
-		fi
+		tar_file=dgraph-$platform-amd64".tar.gz"
+		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$tar_file
 
 		# Download and untar Dgraph binaries
 		if curl --output /dev/null --silent --head --fail "$dgraph_link"; then
@@ -134,12 +133,32 @@ printf $RESET
 		fi
 
 		print_step "Inflating binaries (password may be required).";
-		$sudo_cmd tar -C /usr/local/bin -xzf /tmp/$tar_file;
+		temp_dir=$(mktemp -d)
+		tar -C $temp_dir -xzf /tmp/$tar_file
+		dgraphsum=$($digest_cmd $temp_dir/dgraph | awk '{print $1;}')
+		if [ "$dgraph" != "$dgraphsum" ]; then
+			print_error "Downloaded binaries checksum doesn't match with latest versions checksum"
+			exit 1;
+		else
+			print_good "Downloaded binaries checksum matched with latest versions checksum"
+		fi
+
+		# Backup existing dgraph binaries in HOME directory
+		if hash dgraph 2>/dev/null; then
+			dgraph_path="$(which dgraph)"
+			dgraph_backup="dgraph_backup_olderversion"
+			print_step "Backing up older versions in ~/$dgraph_backup (password may be required)."
+			mkdir -p ~/$dgraph_backup
+			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
+		fi
+
+		$sudo_cmd mv $temp_dir/* /usr/local/bin/.
 		rm "/tmp/"$tar_file;
+		rm -rf $temp_dir
 
 		# Check installation
 		if hash dgraph 2>/dev/null; then
-			print_good "Dgraph binaries $release_version have been installed successfully in /usr/local/bin.";
+			print_good "Dgraph binaries $tag have been installed successfully in /usr/local/bin.";
 		else
 			print_error "Installation failed. Please try again.";
 			exit 1;
