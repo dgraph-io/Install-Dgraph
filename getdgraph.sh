@@ -81,9 +81,18 @@ printf $RESET
 	  exit 1
 	fi
 
+	if [ "$1" == "" ]; then
+		tag=$release_version
+	elif [ "$1" == "nightly" ]; then
+		tag="nightly"
+	else
+		print_error "Invalid argument "$1"."
+		exit 1
+	fi
+
 	checksum_file="dgraph-checksum-$platform-amd64-$release_version".sha256
-	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$checksum_file
-	print_step "Downloading checksum file."
+	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$checksum_file
+	print_step "Downloading checksum file for ${tag} build."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
 	else
@@ -111,7 +120,7 @@ printf $RESET
 		print_good "You already have Dgraph $release_version installed."
 	else
 		tar_file=dgraph-$platform-amd64-$release_version".tar.gz"
-		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$release_version"/"$tar_file
+		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$tar_file
 
 		# Download and untar Dgraph binaries
 		if curl --output /dev/null --silent --head --fail "$dgraph_link"; then
@@ -129,9 +138,10 @@ printf $RESET
 		tar -C $temp_dir -xzf /tmp/$tar_file
 		dgraphsum=$($digest_cmd $temp_dir/dgraph | awk '{print $1;}')
 		if [ "$dgraph" != "$dgraphsum" ]; then
-      print_error "Downloaded binaries checksum doesn't match with latest versions checksum"
-			echo
+			print_error "Downloaded binaries checksum doesn't match with latest versions checksum"
 			exit 1;
+		else
+			print_good "Downloaded binaries checksum matched with latest versions checksum"
 		fi
 
 		# Backup existing dgraph binaries in HOME directory
