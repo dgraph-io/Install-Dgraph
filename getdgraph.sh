@@ -58,7 +58,6 @@ printf $RESET
 		print_error "Could not find curl. Please install curl and try again.";
 		exit 1;
 	fi
-
 	sudo_cmd=""
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
@@ -90,7 +89,7 @@ printf $RESET
 		exit 1
 	fi
 
-	checksum_file="dgraph-checksum-$platform-amd64-$release_version".sha256
+	checksum_file="dgraph-checksum-$platform-amd64".sha256
 	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$checksum_file
 	print_step "Downloading checksum file for ${tag} build."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
@@ -117,9 +116,9 @@ printf $RESET
 	fi
 
 	if [ "$dgraph" == "$dgraphsum" ]; then
-		print_good "You already have Dgraph $release_version installed."
+		print_good "You already have Dgraph $tag installed."
 	else
-		tar_file=dgraph-$platform-amd64-$release_version".tar.gz"
+		tar_file=dgraph-$platform-amd64".tar.gz"
 		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$tar_file
 
 		# Download and untar Dgraph binaries
@@ -159,7 +158,7 @@ printf $RESET
 
 		# Check installation
 		if hash dgraph 2>/dev/null; then
-			print_good "Dgraph binaries $release_version have been installed successfully in /usr/local/bin.";
+			print_good "Dgraph binaries $tag have been installed successfully in /usr/local/bin.";
 		else
 			print_error "Installation failed. Please try again.";
 			exit 1;
