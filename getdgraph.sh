@@ -133,7 +133,7 @@ printf $RESET
 		fi
 
 		print_step "Inflating binaries (password may be required).";
-		temp_dir=$(mktemp -d)
+		temp_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 		tar -C $temp_dir -xzf /tmp/$tar_file
 		dgraphsum=$($digest_cmd $temp_dir/dgraph | awk '{print $1;}')
 		if [ "$dgraph" != "$dgraphsum" ]; then
