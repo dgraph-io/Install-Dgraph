@@ -139,8 +139,6 @@ printf $RESET
 		if [ "$dgraph" != "$dgraphsum" ]; then
 			print_error "Downloaded binaries checksum doesn't match with latest versions checksum"
 			exit 1;
-		else
-			print_good "Downloaded binaries checksum matched with latest versions checksum"
 		fi
 
 		# Backup existing dgraph binaries in HOME directory
