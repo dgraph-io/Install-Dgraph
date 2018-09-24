@@ -61,6 +61,10 @@ printf $RESET
 	sudo_cmd=""
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
+		if ! $sudo_cmd -v; then
+		    print_error "Need sudo privileges to complete installation."
+		    exit 1;
+		fi
 	fi
 
 	install_path="/usr/local/bin"
@@ -75,6 +79,8 @@ printf $RESET
 	  digest_cmd="shasum -a 256"
 	elif hash sha256sum 2>/dev/null; then
 	  digest_cmd="sha256sum"
+	elif hash openssl 2>/dev/null; then
+	  digest_cmd="openssl dgst -sha256"
 	else
 	  print_error "Could not find suitable hashing utility. Please install shasum or sha256sum and try again.";
 	  exit 1
@@ -100,7 +106,7 @@ printf $RESET
 		exit 1;
 	fi
 
-	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | awk '{print $1;}')
+	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | grep -E -o '[a-zA-Z0-9]{64}')
 
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
@@ -110,7 +116,7 @@ printf $RESET
 	print_step "Comparing checksums for dgraph binaries"
 
 	if $digest_cmd /usr/local/bin/dgraph &>/dev/null; then
-		dgraphsum=$($digest_cmd /usr/local/bin/dgraph | awk '{print $1;}')
+		dgraphsum=$($digest_cmd /usr/local/bin/dgraph | grep -E -o '[a-zA-Z0-9]{64}')
 	else
 		dgraphsum=""
 	fi
