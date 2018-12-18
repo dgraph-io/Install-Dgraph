@@ -21,6 +21,8 @@ GREEN='\033[32;1m'
 RESET='\033[0m'
 WHITE='\033[97;1m'
 
+ACCEPT_LICENSE="n"
+
 print_instruction() {
     printf "$WHITE$1$RESET\n"
 }
@@ -35,6 +37,26 @@ print_error() {
 
 print_good() {
     printf "$GREEN$1$RESET\n"
+}
+
+check_license_agreement() {
+	curl -s https://raw.githubusercontent.com/dgraph-io/dgraph/master/licenses/DCL.txt
+	cat << "EOF"
+
+By downloading Dgraph you agree to the Dgraph Community License (DCL) terms
+shown above. An open source (Apache 2.0) version of Dgraph without any
+DCL-licensed enterprise features is available by building from the Dgraph
+source code. See the source installation instructions for more info:
+
+    https://github.com/dgraph-io/dgraph#install-from-source
+
+EOF
+	if [ ! "$ACCEPT_LICENSE" = "y" ]; then
+		read -p 'Do you agree to the terms of the Dgraph Community License? [Y/n] ' response
+		[[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
+	else
+		echo 'Dgraph Community License terms accepted with -y option.'
+	fi
 }
 
 install_dgraph() {
@@ -62,9 +84,14 @@ printf $RESET
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
 		if ! $sudo_cmd -v; then
-		    print_error "Need sudo privileges to complete installation."
-		    exit 1;
+			print_error "Need sudo privileges to complete installation."
+			exit 1;
 		fi
+	fi
+
+	if ! check_license_agreement; then
+		print_error 'You must agree to the license terms to install Dgraph.'
+		exit 1
 	fi
 
 	install_path="/usr/local/bin"
@@ -179,4 +206,16 @@ function exit_error {
 }
 
 trap exit_error EXIT
+for f in $@; do
+	case $f in
+		'-y' )
+			ACCEPT_LICENSE=y
+			;;
+		*)
+			print_error "unknown option $1"
+			exit 1
+			;;
+	esac
+	shift
+done
 install_dgraph "$@"
