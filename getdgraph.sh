@@ -52,7 +52,7 @@ source code. See the source installation instructions for more info:
 
 EOF
 	if [ ! "$ACCEPT_LICENSE" = "y" ]; then
-		read -p 'Do you agree to the terms of the Dgraph Community License? [Y/n] ' response
+		read -p 'Do you agree to the terms of the Dgraph Community License? [Y/n] ' response < /dev/tty
 		[[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
 	else
 		echo 'Dgraph Community License terms accepted with -y option.'
