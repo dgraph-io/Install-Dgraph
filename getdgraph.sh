@@ -55,7 +55,7 @@ EOF
 		read -p 'Do you agree to the terms of the Dgraph Community License? [Y/n] ' response < /dev/tty
 		[[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
 	else
-		echo 'Dgraph Community License terms accepted with -y option.'
+		echo 'Dgraph Community License terms accepted with -y/--accept-license option.'
 	fi
 }
 
@@ -208,7 +208,7 @@ function exit_error {
 trap exit_error EXIT
 for f in $@; do
 	case $f in
-		'-y' )
+		'-y'|'--accept-license')
 			ACCEPT_LICENSE=y
 			;;
 		*)
