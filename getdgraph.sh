@@ -115,8 +115,6 @@ printf $RESET
 
 	if [ "$1" == "" ]; then
 		tag=$release_version
-	elif [ "$1" == "nightly" ]; then
-		tag="nightly"
 	else
 		print_error "Invalid argument "$1"."
 		exit 1
