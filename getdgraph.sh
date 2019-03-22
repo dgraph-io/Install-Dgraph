@@ -172,6 +172,9 @@ printf $RESET
 			exit 1;
 		fi
 
+		# Create /usr/local/bin directory if it doesn't exist.
+		$sudo_cmd mkdir -p /usr/local/bin
+
 		# Backup existing dgraph binaries in HOME directory
 		if hash dgraph 2>/dev/null; then
 			dgraph_path="$(which dgraph)"
