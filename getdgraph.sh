@@ -75,6 +75,8 @@ cat << "EOF"
 EOF
 printf $RESET
 
+	install_path="/usr/local/bin"
+
 	# Check curl is installed
 	if ! hash curl 2>/dev/null; then
 		print_error "Could not find curl. Please install curl and try again.";
@@ -83,6 +85,7 @@ printf $RESET
 	sudo_cmd=""
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
+                echo "Requires sudo permission to install Dgraph binaries to $install_path."
 		if ! $sudo_cmd -v; then
 			print_error "Need sudo privileges to complete installation."
 			exit 1;
@@ -93,8 +96,6 @@ printf $RESET
 		print_error 'You must agree to the license terms to install Dgraph.'
 		exit 1
 	fi
-
-	install_path="/usr/local/bin"
 
 	release_version="$(curl -s https://get.dgraph.io/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
 	print_step "Latest release version is $release_version."
