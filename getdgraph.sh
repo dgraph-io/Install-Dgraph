@@ -22,6 +22,8 @@ RESET='\033[0m'
 WHITE='\033[97;1m'
 
 ACCEPT_LICENSE="n"
+INSTALL_IN_SYSTEMD="n"
+sudo_cmd=""
 
 print_instruction() {
     printf "$WHITE$1$RESET\n"
@@ -82,7 +84,7 @@ printf $RESET
 		print_error "Could not find curl. Please install curl and try again.";
 		exit 1;
 	fi
-	sudo_cmd=""
+
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
                 echo "Requires sudo permission to install Dgraph binaries to $install_path."
@@ -201,6 +203,39 @@ printf $RESET
 	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
 }
 
+setup_systemD() {
+
+	pathToFiles="https://raw.githubusercontent.com/dgraph-io/dgraph/master/contrib/systemd/centos"
+	systemdPath="/etc/systemd/system/"
+	dgraphPath="/var/lib/dgraph"
+
+	$sudo_cmd mkdir -p $dgraphPath
+	$sudo_cmd mkdir -p $dgraphPath/{p,w,zw}
+	$sudo_cmd mkdir -p /var/log/dgraph
+
+	$sudo_cmd groupadd --system dgraph
+	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
+	$sudo_cmd chown -R dgraph:dgraph /var/{lib,log}/dgraph
+
+	_alpha="$pathToFiles/dgraph-alpha.service"
+	_zero="$pathToFiles/dgraph-zero.service"
+	_ui="$pathToFiles/dgraph-ui.service"
+	_addAccount="$pathToFiles/add_dgraph_account.sh"
+
+	$sudo_cmd curl -LJ --progress-bar "$_alpha" -o "$systemdPath/dgraph-alpha.service"
+	$sudo_cmd curl -LJ --progress-bar "$_zero" -o "$systemdPath/dgraph-zero.service"
+	$sudo_cmd curl -LJ --progress-bar "$_ui" -o "$systemdPath/dgraph-ui.service"
+
+	$sudo_cmd systemctl daemon-reload
+	
+	$sudo_cmd systemctl enable dgraph-alpha
+	$sudo_cmd systemctl start dgraph-alpha
+
+	$sudo_cmd systemctl enable dgraph-ui
+	$sudo_cmd systemctl start dgraph-ui
+
+}
+
 function exit_error {
   if [ "$?" -ne 0 ]; then
     print_error "There was some problem while installing Dgraph. Please share the output of this script with us on https://dgraph.slack.com or https://discuss.dgraph.io so that we can resolve the issue for you."
@@ -213,6 +248,10 @@ for f in $@; do
 		'-y'|'--accept-license')
 			ACCEPT_LICENSE=y
 			;;
+		'--systemd')
+			echo "Systemd installation was requested."
+			INSTALL_IN_SYSTEMD="y"
+			;;
 		*)
 			print_error "unknown option $1"
 			exit 1
@@ -221,3 +260,7 @@ for f in $@; do
 	shift
 done
 install_dgraph "$@"
+
+if [ "$INSTALL_IN_SYSTEMD" = "y" ]; then
+		setup_systemD
+fi
