@@ -84,10 +84,16 @@ printf $RESET
 		print_error "Could not find curl. Please install curl and try again.";
 		exit 1;
 	fi
+	# Check tar is installed
+	if ! hash tar 2>/dev/null; then
+		print_error "Could not find tar. Please install tar and try again.";
+		exit 1;
+	fi
 
+	# Check sudo permissions
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
-                echo "Requires sudo permission to install Dgraph binaries to $install_path."
+		echo "Requires sudo permission to install Dgraph binaries to $install_path."
 		if ! $sudo_cmd -v; then
 			print_error "Need sudo privileges to complete installation."
 			exit 1;
