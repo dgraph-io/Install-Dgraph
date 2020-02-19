@@ -232,6 +232,12 @@ printf $RESET
 	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
 }
 
+addGroup() {
+	$sudo_cmd groupadd --system dgraph
+	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
+	exit 0
+}
+
 setup_systemD() {
 
 	pathToFiles="https://raw.githubusercontent.com/dgraph-io/dgraph/master/contrib/systemd/centos"
@@ -242,8 +248,6 @@ setup_systemD() {
 	$sudo_cmd mkdir -p $dgraphPath/{p,w,zw}
 	$sudo_cmd mkdir -p /var/log/dgraph
 
-	$sudo_cmd groupadd --system dgraph
-	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
 	$sudo_cmd chown -R dgraph:dgraph /var/{lib,log}/dgraph
 
 	_alpha="$pathToFiles/dgraph-alpha.service"
@@ -314,7 +318,6 @@ done
 install_dgraph "$@"
 
 if [ "$INSTALL_IN_SYSTEMD" = "y" ]; then
-	echo "Systemd installation was requested."
-    verify_system
-    setup_systemD
+		echo "Systemd installation was requested."
+		addGroup | setup_systemD
 fi
