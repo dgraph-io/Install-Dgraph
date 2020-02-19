@@ -21,9 +21,13 @@ GREEN='\033[32;1m'
 RESET='\033[0m'
 WHITE='\033[97;1m'
 
-ACCEPT_LICENSE="n"
-INSTALL_IN_SYSTEMD="n"
+acceptLower=`echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null`
+systemdLower=`echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null`
+
+ACCEPT_LICENSE=${acceptLower:-n}
+INSTALL_IN_SYSTEMD=${systemdLower:-n}
 sudo_cmd=""
+argVersion=
 
 print_instruction() {
     printf "$WHITE$1$RESET\n"
@@ -105,7 +109,26 @@ printf $RESET
 		exit 1
 	fi
 
-	release_version="$(curl -s https://get.dgraph.io/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
+	check_versions(){
+		toCompare="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/tags/${release_version} | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1 )"
+			if [ "$release_version" == "$toCompare" ]; then
+			    continue
+				else
+				print_error "This version doesn't exist or it is a typo (Tip: You need to add \"v\" eg: v2.0.0-rc1)"
+				exit 1
+			fi
+	}
+
+	if [ -n "${VERSION}" ] || [ -n "${argVersion}" ]; then
+	    # Environment variable is preferred over command-line argument
+	    release_version="${VERSION:-${argVersion}}"
+		check_versions
+	    echo $release_version
+    else
+        release_version="$(curl -s https://get.dgraph.io/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
+	    echo $release_version
+    fi
+
 	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
@@ -209,6 +232,12 @@ printf $RESET
 	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
 }
 
+addGroup() {
+	$sudo_cmd groupadd --system dgraph
+	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
+	exit 0
+}
+
 setup_systemD() {
 
 	pathToFiles="https://raw.githubusercontent.com/dgraph-io/dgraph/master/contrib/systemd/centos"
@@ -219,8 +248,6 @@ setup_systemD() {
 	$sudo_cmd mkdir -p $dgraphPath/{p,w,zw}
 	$sudo_cmd mkdir -p /var/log/dgraph
 
-	$sudo_cmd groupadd --system dgraph
-	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
 	$sudo_cmd chown -R dgraph:dgraph /var/{lib,log}/dgraph
 
 	_alpha="$pathToFiles/dgraph-alpha.service"
@@ -248,25 +275,49 @@ function exit_error {
   fi
 }
 
+verify_system() {
+    if [ -x /sbin/openrc-run ]; then
+        HAS_OPENRC=true
+        print_error "Sorry we don't support OpenRC for now"
+        return 1
+    fi
+    if [ -d /run/systemd ]; then
+        HAS_SYSTEMD=true
+		print_good 'Habemus SYSTEMD'
+		INSTALL_IN_SYSTEMD="y"
+        return
+    fi
+    print_error "Systemd was not found."
+    return 1
+}
+
 trap exit_error EXIT
 for f in $@; do
 	case $f in
 		'-y'|'--accept-license')
 			ACCEPT_LICENSE=y
 			;;
-		'--systemd')
-			echo "Systemd installation was requested."
+		'-s'|'--systemd')
 			INSTALL_IN_SYSTEMD="y"
+			;;
+		'-v='*|'--version='*)
+			argVersion=${f#*=}
 			;;
 		*)
 			print_error "unknown option $1"
+				echo "Usage:"
+				echo "	-v='' | --version='2.0.1'       : Choose Dgraph's version manually."
+				echo "	-s    | --systemd               : Install Dgraph as a service."
+				echo "	-y    | --accept-license        : Automatically agree to the terms of the Dgraph Community License."
 			exit 1
 			;;
 	esac
 	shift
 done
+
 install_dgraph "$@"
 
 if [ "$INSTALL_IN_SYSTEMD" = "y" ]; then
-		setup_systemD
+		echo "Systemd installation was requested."
+		addGroup | setup_systemD
 fi
