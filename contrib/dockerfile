@@ -1,0 +1,13 @@
+# escape=`
+FROM mcr.microsoft.com/powershell:lts-nanoserver-1903
+USER ContainerAdministrator
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+RUN iwr https://get.dgraph.io/windows -useb | iex
+
+RUN setx /M PATH "%PATH%;C:\Program Files\PowerShell"
+
+EXPOSE 8080 6080 8000
+
+ENTRYPOINT [ "pwsh.exe" ]
