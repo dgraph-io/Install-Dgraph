@@ -35,10 +35,30 @@ curl https://get.dgraph.io -sSf | bash
 
 ### Using Powershell
 
+This script needs to be executed with ExecutionPolicy set as RemoteSigned"
+please run (as Administrator):"
+
+```
+Set-ExecutionPolicy -ExecutionPolicy "RemoteSigned"
+```
+
+After run the script you can set it to `-ExecutionPolicy "Undefined"`
+
 From `https://get.dgraph.io/windows`:
 ```shell
- # Todo
+iwr https://get.dgraph.io/windows -useb | iex
 ```
+
+Download the script and run locally
+```shell
+iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1
+```
+
+## Environment Variables
+
+`$Version="v20.03.1"`: Choose Dgraph’s version manually (default: The latest stable release).
+
+`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v2.0.0-beta1 or -rc1).
 
 # Compatibility
 
