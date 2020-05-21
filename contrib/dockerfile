@@ -6,7 +6,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 
 RUN iwr https://get.dgraph.io/windows -useb | iex
 
-RUN setx /M PATH "%PATH%;C:\Program Files\PowerShell"
+RUN setx /M PATH "%PATH%;C:\dgraph-io"
 
 EXPOSE 8080 6080 8000
 
