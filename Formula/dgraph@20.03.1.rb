@@ -4,7 +4,7 @@ class DgraphAt20031 < Formula
 
     version "20.03.1"
     url "https://github.com/dgraph-io/dgraph/releases/download/v20.03.1/dgraph-darwin-amd64.tar.gz"
-    sha256 "d7ae075a906e4e3133c64a948fb2ce3ad4edc6fd0c97a63e2a81422e425b5a87"
+    sha256 "5ce1dbb9830025ef98c540637aad969256cda4d375770360e0f6de7c338addf4"
     head "https://github.com/dgraph-io/dgraph.git"
 
     bottle :unneeded
