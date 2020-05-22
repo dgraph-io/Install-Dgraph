@@ -1,0 +1,16 @@
+Id: Dgraph-io.Dgraph
+Publisher: Dgraph Labs Inc.
+Name: Dgraph
+Description: Fast, Distributed Graph DB.
+Version: 20.03.0
+Homepage: https://dgraph.io
+Tags: Go,Graph,DB
+License: Apache 2.0
+LicenseUrl: https://raw.githubusercontent.com/dgraph-io/dgraph/master/licenses/DCL.txt
+InstallerType: msi # enumeration of supported installer types (exe, msi, msix)
+Installers:
+  - Arch: x64 # enumeration of supported architectures
+    URL: string # path to download installation file
+    Sha256: string # SHA256 calculated from installer
+    InstallerType: Inno #supported types Inno, Nullsoft
+# ManifestVersion: 0.1.0
