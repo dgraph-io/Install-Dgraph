@@ -45,8 +45,9 @@ $currentAdm = $currentAdm.IsInRole([Security.Principal.WindowsBuiltInRole]::Admi
 $ROOTPath = "$setPath$dgraphIO"
 $ExecPolicy = (Get-ExecutionPolicy)
 
-function Invoke-Download ($_URL) {
+function Invoke-Download {
 	param(
+		[string] $_URL,
         [int] $Retries = 20
 	)
 	while ($Retries -gt 0){
