@@ -291,7 +291,7 @@ Write-Good "Installing"
 $RawEnvPath = Get-Raw-Env-Path
 $HasDgraphEnv = $RawEnvPath -Match "dgraph-io"
 
-if ($currentAdm -and !($HasDgraphEnv)) {
+if ($currentAdm -and !($HasDgraphEnv) -and !($env:GITHUB_OS)) {
 	SETX PATH /M "$RawEnvPath;$ROOTPath"
 } elseif(!($currentAdm) -and !($HasDgraphEnv)) {
 	Create-Script
