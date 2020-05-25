@@ -6,9 +6,9 @@
 #   Homepage: https://dgraph.io
 #   Requires: Powershell
 #
-# Hello! This is a script that installs Dgraph
-# into your PATH (which may require to run as Administrator).
-# Use it like this:
+#   Hello! This is a script that installs Dgraph
+#   into your PATH (which may require to run as Administrator).
+#   Use it like this:
 #
 #	$ iwr https://get.dgraph.io/install.ps1 -useb | iex
 #
@@ -32,6 +32,8 @@ param(
 	$ProgressPreference
 )
 
+#Requires -Version 7
+
 # Disable Invoke-WebRequest progress bar to speed up download due to bug
 $ProgressPreference = "SilentlyContinue"
 
@@ -40,9 +42,40 @@ $ProgressPreference = "SilentlyContinue"
 
 $currentAdm = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 $currentAdm = $currentAdm.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-$latest_release = Invoke-WebRequest $URL -UseBasicParsing | ConvertFrom-Json | Select-Object -Expand tag_name
 $ROOTPath = "$setPath$dgraphIO"
 $ExecPolicy = (Get-ExecutionPolicy)
+
+function Invoke-Download {
+	param(
+		[string] $URL_,
+		[string] $OutFile,
+        [int] $Retries = 20
+	)
+	while ($Retries -gt 0){
+        try{
+			if ($OutFile) {
+				Invoke-WebRequest -Uri $URL_ -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180 -OutFile $OutFile
+			 } else {
+				Invoke-WebRequest -Uri $URL_ -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180
+			}
+            break
+		}
+		catch {
+            Write-Host "There is an error during download:`n $_"
+            $Retries--
+
+            if ($Retries -eq 0) {
+                Write-Host "File can't be downloaded. url: $_URL"
+                exit 1
+            }
+
+            Write-Host "Waiting 11 seconds before retrying. Retries left: $Retries"
+            Start-Sleep -Seconds 11
+		}
+	}
+}
+
+$latest_release = Invoke-Download $URL | ConvertFrom-Json | Select-Object -Expand tag_name
 
 function Invoke-Elevated ($scriptblock) {
 	$_Pwsh = "$psHome\powershell.exe"
@@ -87,12 +120,18 @@ function Write-Error {
 	Write-Host -Object "ERROR: $Message" -ForegroundColor $color
 }
 
+if (($PSVersionTable.PSVersion.Major) -lt 7) {
+    Write-Error "PowerShell 7 or later is required to run this Script."
+    Write-Error "Upgrade PowerShell: https://www.google.com/search?q=upgrade+powershell"
+    break
+}
+
 if ($ExecPolicy -ne "RemoteSigned") {
 	Write-Error "This script needs to be executed with ExecutionPolicy set as RemoteSigned"
 	Write-Error "please run (as Administrator):"
 	Write-Error 'Set-ExecutionPolicy -ExecutionPolicy "RemoteSigned"'
 	Write-Error "After run the script you can set it to `"-ExecutionPolicy Undefined`""
-	return
+	break
 }
 
 if ((Test-Path -LiteralPath "$ROOTPath\dgraph.exe") -and !($Version)) {
@@ -176,7 +215,7 @@ function check_license_agreement () {
 }
 function check_if_exists {
 	try {
-		$response = Invoke-WebRequest -Uri "$TAGsURI/$selectVersion" -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180
+		$response = Invoke-Download "$TAGsURI/$selectVersion"
 		$StatusCode = $Response.StatusCode
 	} catch {
 		$StatusCode = $_.Exception.Response.StatusCode.value__
@@ -217,7 +256,7 @@ function Get-Raw-Env-Path () {
 	return $OutPut
 }
 
-function Create-Script () {
+function Set-Script () {
 	$content = @"
 #!/usr/bin/env pwsh
 SETX PATH /M "$RawEnvPath;;$ROOTPath"
@@ -246,6 +285,7 @@ if ($Agree -eq "NO") {
 	$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
 	return
 }
+
 ###############################################################################
 # Step - Check if the version exists
 ###############################################################################
@@ -263,7 +303,7 @@ check_if_exists
 
 # Write-Output "checksum_link $checksum_link build."
 
-# Invoke-WebRequest -Uri $checksum_link -OutFile $ROOTPath\$checksum_file -UseBasicParsing
+# Invoke-Download -URL_ $checksum_link -OutFile $ROOTPath\$checksum_file
 
 # $dgraphBinHash = Get-FileHash C:\dgraph-io\dgraph.exe | select -expand Hash
 
@@ -280,7 +320,7 @@ Write-Good "Downloading Dgraph wait..."
 
 $dgraph_link = "$releasesURI/$selectVersion/dgraph-windows-amd64.tar.gz"
 
-Invoke-WebRequest -Uri $dgraph_link -OutFile "$ROOTPath\dgraph-windows-amd64.tar.gz" -UseBasicParsing
+Invoke-Download -URL_ $dgraph_link -OutFile "$ROOTPath\dgraph-windows-amd64.tar.gz"
 
 Write-Good "Extracting..."
 
@@ -294,7 +334,7 @@ $HasDgraphEnv = $RawEnvPath -Match "dgraph-io"
 if ($currentAdm -and !($HasDgraphEnv) -and !($env:GITHUB_OS)) {
 	SETX PATH /M "$RawEnvPath;$ROOTPath"
 } elseif(!($currentAdm) -and !($HasDgraphEnv)) {
-	Create-Script
+	Set-Script
 	Invoke-Elevated  "$ROOTPath\setEnv.ps1"
 }
 
