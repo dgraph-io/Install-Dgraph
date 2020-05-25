@@ -156,7 +156,7 @@ function Get-Agree () {
 	)
 	if ($Agree -match "[yY]([eE][sS])?") {
 		$script:Agree = "Y"
-		Write-Good "Dgraph Community License terms accepted with -y/--accept-license option."
+		Write-Good 'Dgraph Community License terms accepted with "-accept-license yes" option.'
 	} else {
 		$script:Agree = "NO"
 	}
