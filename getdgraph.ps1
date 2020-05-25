@@ -65,7 +65,8 @@ function Invoke-Download ($_URL) {
 
             Write-Host "Waiting 11 seconds before retrying. Retries left: $Retries"
             Start-Sleep -Seconds 11
-        }
+		}
+	}
 }
 
 $latest_release = Invoke-Download $URL | ConvertFrom-Json | Select-Object -Expand tag_name
