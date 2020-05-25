@@ -32,6 +32,8 @@ param(
 	$ProgressPreference
 )
 
+#Requires -Version 7
+
 # Disable Invoke-WebRequest progress bar to speed up download due to bug
 $ProgressPreference = "SilentlyContinue"
 
@@ -87,12 +89,18 @@ function Write-Error {
 	Write-Host -Object "ERROR: $Message" -ForegroundColor $color
 }
 
+if (($PSVersionTable.PSVersion.Major) -lt 7) {
+    Write-Error "PowerShell 7 or later is required to run this Script."
+    Write-Error "Upgrade PowerShell: https://www.google.com/search?q=upgrade+powershell"
+    break
+}
+
 if ($ExecPolicy -ne "RemoteSigned") {
 	Write-Error "This script needs to be executed with ExecutionPolicy set as RemoteSigned"
 	Write-Error "please run (as Administrator):"
 	Write-Error 'Set-ExecutionPolicy -ExecutionPolicy "RemoteSigned"'
 	Write-Error "After run the script you can set it to `"-ExecutionPolicy Undefined`""
-	return
+	break
 }
 
 if ((Test-Path -LiteralPath "$ROOTPath\dgraph.exe") -and !($Version)) {
