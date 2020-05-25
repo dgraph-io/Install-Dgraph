@@ -6,9 +6,9 @@
 #   Homepage: https://dgraph.io
 #   Requires: Powershell
 #
-# Hello! This is a script that installs Dgraph
-# into your PATH (which may require to run as Administrator).
-# Use it like this:
+#   Hello! This is a script that installs Dgraph
+#   into your PATH (which may require to run as Administrator).
+#   Use it like this:
 #
 #	$ iwr https://get.dgraph.io/install.ps1 -useb | iex
 #
@@ -42,9 +42,33 @@ $ProgressPreference = "SilentlyContinue"
 
 $currentAdm = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 $currentAdm = $currentAdm.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-$latest_release = Invoke-WebRequest $URL -UseBasicParsing | ConvertFrom-Json | Select-Object -Expand tag_name
 $ROOTPath = "$setPath$dgraphIO"
 $ExecPolicy = (Get-ExecutionPolicy)
+
+function Invoke-Download ($_URL) {
+	param(
+        [int] $Retries = 20
+	)
+	while ($Retries -gt 0){
+        try{
+            Invoke-WebRequest $_URL -UseBasicParsing
+            break
+		}
+		catch {
+            Write-Host "There is an error during package downloading:`n $_"
+            $Retries--
+
+            if ($Retries -eq 0) {
+                Write-Host "File can't be downloaded. url: $_URL"
+                exit 1
+            }
+
+            Write-Host "Waiting 11 seconds before retrying. Retries left: $Retries"
+            Start-Sleep -Seconds 11
+        }
+}
+
+$latest_release = Invoke-Download $URL | ConvertFrom-Json | Select-Object -Expand tag_name
 
 function Invoke-Elevated ($scriptblock) {
 	$_Pwsh = "$psHome\powershell.exe"
