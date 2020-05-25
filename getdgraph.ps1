@@ -47,16 +47,21 @@ $ExecPolicy = (Get-ExecutionPolicy)
 
 function Invoke-Download {
 	param(
-		[string] $_URL,
+		[string] $URL_,
+		[string] $OutFile,
         [int] $Retries = 20
 	)
 	while ($Retries -gt 0){
         try{
-            Invoke-WebRequest $_URL -UseBasicParsing
+			if ($OutFile) {
+				Invoke-WebRequest -Uri $URL_ -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180 -OutFile $OutFile
+			 } else {
+				Invoke-WebRequest -Uri $URL_ -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180
+			}
             break
 		}
 		catch {
-            Write-Host "There is an error during package downloading:`n $_"
+            Write-Host "There is an error during download:`n $_"
             $Retries--
 
             if ($Retries -eq 0) {
@@ -210,7 +215,7 @@ function check_license_agreement () {
 }
 function check_if_exists {
 	try {
-		$response = Invoke-WebRequest -Uri "$TAGsURI/$selectVersion" -UseBasicParsing -ErrorAction:Stop -TimeoutSec 180
+		$response = Invoke-Download "$TAGsURI/$selectVersion"
 		$StatusCode = $Response.StatusCode
 	} catch {
 		$StatusCode = $_.Exception.Response.StatusCode.value__
@@ -251,7 +256,7 @@ function Get-Raw-Env-Path () {
 	return $OutPut
 }
 
-function Create-Script () {
+function Set-Script () {
 	$content = @"
 #!/usr/bin/env pwsh
 SETX PATH /M "$RawEnvPath;;$ROOTPath"
@@ -280,6 +285,7 @@ if ($Agree -eq "NO") {
 	$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
 	return
 }
+
 ###############################################################################
 # Step - Check if the version exists
 ###############################################################################
@@ -297,7 +303,7 @@ check_if_exists
 
 # Write-Output "checksum_link $checksum_link build."
 
-# Invoke-WebRequest -Uri $checksum_link -OutFile $ROOTPath\$checksum_file -UseBasicParsing
+# Invoke-Download -URL_ $checksum_link -OutFile $ROOTPath\$checksum_file
 
 # $dgraphBinHash = Get-FileHash C:\dgraph-io\dgraph.exe | select -expand Hash
 
@@ -314,7 +320,7 @@ Write-Good "Downloading Dgraph wait..."
 
 $dgraph_link = "$releasesURI/$selectVersion/dgraph-windows-amd64.tar.gz"
 
-Invoke-WebRequest -Uri $dgraph_link -OutFile "$ROOTPath\dgraph-windows-amd64.tar.gz" -UseBasicParsing
+Invoke-Download -URL_ $dgraph_link -OutFile "$ROOTPath\dgraph-windows-amd64.tar.gz"
 
 Write-Good "Extracting..."
 
@@ -328,7 +334,7 @@ $HasDgraphEnv = $RawEnvPath -Match "dgraph-io"
 if ($currentAdm -and !($HasDgraphEnv) -and !($env:GITHUB_OS)) {
 	SETX PATH /M "$RawEnvPath;$ROOTPath"
 } elseif(!($currentAdm) -and !($HasDgraphEnv)) {
-	Create-Script
+	Set-Script
 	Invoke-Elevated  "$ROOTPath\setEnv.ps1"
 }
 
