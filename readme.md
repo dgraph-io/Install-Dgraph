@@ -1,4 +1,4 @@
-# Dgraph Install
+# Dgraph Install Scripts
 
 This repository is home to the installation scripts that you find at `https://get.dgraph.io` and others.
 
@@ -10,28 +10,52 @@ Works for:
 <!-- Todo: Add Windows Version with Powershell version tested. -->
 <!-- Todo: Add Systemd references. -->
 
-## Install Dgraph on Linux and macOS
+# Install Dgraph on Linux and macOS
 
 <!-- Todo: Add Brew formula here. -->
 
 ### Using Shell
 
-From `https://get.dgraph.io`:
+From `https://get.dgraph.io`
+
+Download latest:
 ```shell
 curl https://get.dgraph.io -sSf | bash
 ```
 
+Download latest and install as Systemd services (just Linux):
+
+```shell
+curl https://get.dgraph.io -sSf | bash -s -- --systemd
+```
+
+With Environment Variables:
+
+```shell
+curl https://get.dgraph.io -sSf | VERSION=v20.03.1-beta1 bash
+```
+
 ## Flags
 
-<!-- Todo: Add Flags for shell. -->
+Add `-s --` before the flags.
+
+>`-y | --accept-license`: Automatically agree to the terms of the Dgraph Community License (default: “n”).
+
+>`-s | --systemd`: Automatically create Dgraph’s installation as Systemd services (default: “n”).
+
+>`-v | --version`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v20.03.1-beta1 or -rc1).
+
 
 ## Environment Variables
 
-<!-- Todo: Add Env Vars for shell. -->
+>`ACCEPT_LICENSE`: Automatically agree to the terms of the Dgraph Community License (default: “n”).
 
-## Install Dgraph on Windows
+>`INSTALL_IN_SYSTEMD`: Automatically create Dgraph’s installation as Systemd services (default: “n”).
 
-<!-- Todo: Add .ps1 script. -->
+>`VERSION`: Choose Dgraph’s version manually (default: The latest stable release).
+
+
+# Install Dgraph on Windows
 
 ### Using Powershell
 
@@ -56,9 +80,9 @@ iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1
 
 ## Environment Variables
 
-`$Version="v20.03.1"`: Choose Dgraph’s version manually (default: The latest stable release).
+>`$Version="v20.03.1"`: Choose Dgraph’s version manually (default: The latest stable release).
 
-`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v2.0.0-beta1 or -rc1).
+>`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v2.0.0-beta1 or -rc1).
 
 # Compatibility
 
