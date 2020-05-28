@@ -158,7 +158,7 @@ printf $RESET
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
 	else
-		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io/deploy/#building-from-source"
+		print_error "Sorry. Binaries not available for your platform. Please compile manually: https://dgraph.io/docs/deploy/#building-from-source"
 		echo
 		exit 1;
 	fi
@@ -190,7 +190,7 @@ printf $RESET
 			curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
 			print_good "Download complete."
 		else
-			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://docs.dgraph.io/deploy/#building-from-source"
+			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://dgraph.io/docs/deploy/#building-from-source"
 			echo
 			exit 1;
 		fi
@@ -229,7 +229,7 @@ printf $RESET
 		fi
 	fi
 
-	print_instruction "Please visit https://docs.dgraph.io/get-started for further instructions on usage."
+	print_instruction "Please visit https://dgraph.io/docs/get-started for further instructions on usage."
 }
 
 addGroup() {
