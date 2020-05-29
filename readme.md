@@ -6,6 +6,8 @@ Works for:
 
 * :white_check_mark: Ubuntu 16.04 and above 
 * :white_check_mark: macOS Sierra and above
+* :white_check_mark: Windows 10 and above
+* :white_check_mark: Windows Server 2016 above
 
 <!-- Todo: Add Windows Version with Powershell version tested. -->
 <!-- Todo: Add Systemd references. -->
@@ -68,15 +70,37 @@ Set-ExecutionPolicy -ExecutionPolicy "RemoteSigned"
 
 After run the script you can set it to `-ExecutionPolicy "Undefined"`
 
-From `https://get.dgraph.io/windows`:
+From `https://get.dgraph.io/windows`
+
+Download latest:
+
 ```shell
 iwr https://get.dgraph.io/windows -useb | iex
 ```
 
+With Environment Variables:
+
+```shell
+$Version="v20.03.1"; $acceptLicense="yes"; iwr http://get.dgraph.io/windows -useb | iex
+```
+
 Download the script and run locally
+
 ```shell
 iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1
 ```
+
+Run locally with flags
+
+```shell
+iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1 -version v20.03.1 -acceptLicense yes
+```
+
+## Flags
+
+>`-acceptLicense`: Automatically agree to the terms of the Dgraph Community License (default: ask).
+
+>`-version`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v20.03.1-beta1 or -rc1).
 
 ## Environment Variables
 
@@ -84,6 +108,8 @@ iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1
 
 >`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v2.0.0-beta1 or -rc1).
 
-# Compatibility
+## Compatibility
 
-<!-- Todo: Check Compatibility wioth Windows Subsystem for Linux. -->
+This Scrip works on Windows 10, some Windows containers and Windows Server 2016 only.
+
+<!-- Todo: Check Compatibility with Windows Subsystem for Linux. -->
