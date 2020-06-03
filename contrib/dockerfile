@@ -1,0 +1,13 @@
+# From https://gist.github.com/darkn3rd/1e8ec7e6f60c3e10c682e02f388f1de0
+
+FROM nginx
+
+RUN mkdir -p /var/www
+
+COPY ../getdgraph.ps1 /var/www
+
+RUN chown -R www-data:www-data /var/www
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+RUN chown -R www-data:www-data /var/www
