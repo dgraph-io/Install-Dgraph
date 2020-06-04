@@ -22,6 +22,6 @@ jobs:
         dgraph version
     - name: 'NGINX test'
       run: |
-        docker build . --file .\contrib\Dockerfile --tag testwin:latest
-        docker run -d -p 80:80 testwin:latest
+        docker build . --file .\contrib\Dockerfile --tag testwin
+        docker run -d -p 80:80 testwin
         $Version="v20.03.1"; $acceptLicense="yes"; iwr http://localhost/windows -useb | iex
