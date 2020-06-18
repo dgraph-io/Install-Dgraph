@@ -30,19 +30,19 @@ sudo_cmd=""
 argVersion=
 
 print_instruction() {
-    printf "$WHITE$1$RESET\n"
+    printf '%b\n' "$WHITE$1$RESET"
 }
 
 print_step() {
-    printf "$BLACK$1$RESET\n"
+    printf '%b\n' "$BLACK$1$RESET"
 }
 
 print_error() {
-    printf "$RED$1$RESET\n"
+    printf '%b\n' "$RED$1$RESET"
 }
 
 print_good() {
-    printf "$GREEN$1$RESET\n"
+    printf '%b\n' "$GREEN$1$RESET"
 }
 
 check_license_agreement() {
@@ -67,7 +67,7 @@ EOF
 
 install_dgraph() {
 
-printf $BLACK
+printf "%b" "$BLACK"
 cat << "EOF"
   _____                        _
  |  __ \                      | |
@@ -79,7 +79,7 @@ cat << "EOF"
          |___/          |_|
 
 EOF
-printf $RESET
+printf "%b" "$RESET"
 
 	install_path="/usr/local/bin"
 
