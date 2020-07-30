@@ -15,11 +15,11 @@
 
 set -e
 
-BLACK='\033[30;1m'
+DIM='\033[2m'
+BOLD='\033[1m'
 RED='\033[91;1m'
 GREEN='\033[32;1m'
 RESET='\033[0m'
-WHITE='\033[97;1m'
 
 acceptLower=`echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null`
 systemdLower=`echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null`
@@ -30,11 +30,11 @@ sudo_cmd=""
 argVersion=
 
 print_instruction() {
-    printf '%b\n' "$WHITE$1$RESET"
+    printf '%b\n' "$BOLD$1$RESET"
 }
 
 print_step() {
-    printf '%b\n' "$BLACK$1$RESET"
+    printf '%b\n' "$DIM$1$RESET"
 }
 
 print_error() {
@@ -67,7 +67,7 @@ EOF
 
 install_dgraph() {
 
-printf "%b" "$BLACK"
+printf "%b" "$BOLD"
 cat << "EOF"
   _____                        _
  |  __ \                      | |
