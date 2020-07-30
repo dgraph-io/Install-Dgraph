@@ -15,11 +15,11 @@
 
 set -e
 
-BLACK='\033[30;1m'
+DIM='\033[2m'
+BOLD='\033[1m'
 RED='\033[91;1m'
 GREEN='\033[32;1m'
 RESET='\033[0m'
-WHITE='\033[97;1m'
 
 acceptLower=`echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null`
 systemdLower=`echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null`
@@ -30,19 +30,19 @@ sudo_cmd=""
 argVersion=
 
 print_instruction() {
-    printf "$WHITE$1$RESET\n"
+    printf '%b\n' "$BOLD$1$RESET"
 }
 
 print_step() {
-    printf "$BLACK$1$RESET\n"
+    printf '%b\n' "$DIM$1$RESET"
 }
 
 print_error() {
-    printf "$RED$1$RESET\n"
+    printf '%b\n' "$RED$1$RESET"
 }
 
 print_good() {
-    printf "$GREEN$1$RESET\n"
+    printf '%b\n' "$GREEN$1$RESET"
 }
 
 check_license_agreement() {
@@ -67,7 +67,7 @@ EOF
 
 install_dgraph() {
 
-printf $BLACK
+printf "%b" "$BOLD"
 cat << "EOF"
   _____                        _
  |  __ \                      | |
@@ -79,7 +79,7 @@ cat << "EOF"
          |___/          |_|
 
 EOF
-printf $RESET
+printf "%b" "$RESET"
 
 	install_path="/usr/local/bin"
 
