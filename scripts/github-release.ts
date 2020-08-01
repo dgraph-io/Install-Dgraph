@@ -5,6 +5,7 @@ let token: string = '';
 interface githubRepoTags {
     nodes: Node[];
     totalCount: number;
+    tag_name: string;
 }
 
 interface Node {
@@ -29,6 +30,7 @@ let list: githubRepoTags = {
             "tagName": "v0.3"
         }
     ],
+    "tag_name": "0",
     "totalCount": 0
 };
 
@@ -83,8 +85,9 @@ const update_latest_release = async (token : string) => {
         let latestBeta = data.filter(e => e.tagName.match(Be))
         let latestRC = data.filter(e => e.tagName.match(RC))
         let latestCalVer = data.filter(e => (e.tagName.match(CalVer) && !e.tagName.match(RC)) && !e.tagName.match(Be))
+        let tag_name = latestCalVer[0].tagName;
 
-        writeJson("./latest-release.txt", {latestBeta, latestRC, latestCalVer});
+        writeJson("./latest-release.txt", {latestBeta, latestRC, latestCalVer, tag_name });
     } catch (error) {
         throw error;
     }
