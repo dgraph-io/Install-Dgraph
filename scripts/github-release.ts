@@ -1,6 +1,14 @@
 import {exists, writeJson} from "https://deno.land/std@0.63.0/fs/mod.ts";
+import {exec} from 'https://cdn.depjs.com/exec/mod.ts'
 
 let token: string = '';
+let rebuild: boolean = false;
+
+interface execSYSOptions {
+    Entrypoint?: string;
+    command?: string;
+    path?: string;
+}
 
 interface githubRepoTags {
     nodes: Node[];
@@ -12,18 +20,6 @@ interface Node {
     tagName: string;
 }
 
-if (import.meta.main) {
-    let TK = /--token/g;
-    let getToke = Deno.args.filter(e => e.match(TK))
-    if (getToke.length === 1) {
-        token = getToke[0] ?. replace("--token", "").replace("=", "")
-    }
-    if (getToke.length === 0) {
-        console.error("Provide a token")
-        throw "exit";
-    }
-}
-
 let list: githubRepoTags = {
     "nodes": [
         {
@@ -33,6 +29,28 @@ let list: githubRepoTags = {
     "tag_name": "0",
     "totalCount": 0
 };
+
+if (import.meta.main) {
+
+    let TK = /--token/g;
+    let RB = /--rebuild/g;
+
+    let getToke = Deno.args.filter(e => e.match(TK))
+    let getRebuild = Deno.args.filter(e => e.match(RB))
+
+    if (getToke.length > 1) {
+        console.error("Provide a single flag for token")
+        throw "exit";
+    } else if (getToke.length === 1) {
+        token = getToke[0] ?. replace("--token", "").replace("=", "")
+    } else {
+        console.error("Provide a token")
+        throw "exit";
+    }
+    if (getRebuild.length === 1) {
+        rebuild = true;
+    }
+}
 
 let query = `query {
     repository(owner:"dgraph-io", name:"dgraph") {
@@ -87,14 +105,51 @@ const update_latest_release = async (token : string) => {
         let latestCalVer = data.filter(e => (e.tagName.match(CalVer) && !e.tagName.match(RC)) && !e.tagName.match(Be))
         let tag_name = latestCalVer[0].tagName;
 
-        writeJson("./latest-release.txt", {latestBeta, latestRC, latestCalVer, tag_name });
+        writeJson("./latest-release.txt", {latestBeta, latestRC, latestCalVer, tag_name});
     } catch (error) {
         throw error;
     }
 }
 
-const sleep = (ms : any) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms : any) => new Promise(resolve => setTimeout(resolve, ms));
+
+const execSYS = async ({Entrypoint, command, path} : execSYSOptions) => {
+    try {
+        return await exec({
+            cmd: [
+                `${Entrypoint}`, '-c', `${command}`
+            ],
+            cwd: `${
+                path ? path : "./"
+            }`
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const rebuildIt = async () => {
+
+    await execSYS({Entrypoint: "sh", command: "apt-get update -y && apt-get upgrade -y", path: "./"})
+    await execSYS({Entrypoint: "sh", command: "apt-get install -y curl bash git", path: "./"})
+    await execSYS({Entrypoint: "sh", command: "deno upgrade --version 1.2.2"})
+
+    await execSYS({Entrypoint: "sh", command: "[ -d Install-Dgraph_build ] || mkdir ./Install-Dgraph_build"})
+    await execSYS({Entrypoint: "sh", command: "git clone https://github.com/dgraph-io/Install-Dgraph.git", path: "./Install-Dgraph_build"})
+    await execSYS({Entrypoint: "sh", command: "rm -rf ./Install-Dgraph"})
+    await execSYS({Entrypoint: "sh", command: "mv ./Install-Dgraph_build/Install-Dgraph ./ "})
+    await execSYS({Entrypoint: "sh", command: "rm -rf ./Install-Dgraph_build"})
+
+    console.log(await exec('deno -V'))
+    console.log(await exec(['which', 'deno']))
+    console.log(await exec(['which', 'git']))
+
+}
+
+if (rebuild) {
+    console.log(await exec('pwd'))
+    console.log('Starting rebuild')
+    rebuildIt();
 }
 
 while (true) {
