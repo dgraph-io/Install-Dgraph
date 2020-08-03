@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  hitwebhook:
+    runs-on: ubuntu-latest
+    steps:
+    - name: CALL API
+      run: |
+       sudo apt-get update -y && \
+       sudo apt-get install -y curl && \
+       curl ${{ secrets.ADDR }} \
+       --header 'content-type: application/json' \
+       --header 'token: ${{ secrets.REMOTETOKEN }}' \
+       --data '{
+       "project" : "c-chhjq:p-fbq69",
+       "typek8s" : "deployment",
+       "namespace" : "websites",
+       "Workload" : "getdgraph",
+       "action" : "redeploy"
+       }'
