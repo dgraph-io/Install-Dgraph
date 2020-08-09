@@ -21,8 +21,8 @@ RED='\033[91;1m'
 GREEN='\033[32;1m'
 RESET='\033[0m'
 
-acceptLower=`echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null`
-systemdLower=`echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null`
+acceptLower=$(echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null)
+systemdLower=$(echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null)
 
 ACCEPT_LICENSE=${acceptLower:-n}
 INSTALL_IN_SYSTEMD=${systemdLower:-n}
@@ -110,9 +110,9 @@ printf "%b" "$RESET"
 	fi
 
 	check_versions(){
-		toCompare="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/tags/${release_version} | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1 )"
+		toCompare="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/tags/"${release_version}" | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1 )"
 			if [ "$release_version" == "$toCompare" ]; then
-			    continue
+			    return
 				else
 				print_error "This version doesn't exist or it is a typo (Tip: You need to add \"v\" eg: v2.0.0-rc1)"
 				exit 1
@@ -123,10 +123,10 @@ printf "%b" "$RESET"
 	    # Environment variable is preferred over command-line argument
 	    release_version="${VERSION:-${argVersion}}"
 		check_versions
-	    echo $release_version
+	    echo "$release_version"
     else
         release_version="$(curl -s https://get.dgraph.io/latest | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1)"
-	    echo $release_version
+	    echo "$release_version"
     fi
 
 	print_step "Latest release version is $release_version."
@@ -146,14 +146,14 @@ printf "%b" "$RESET"
 	fi
 
 	if [ "$1" == "" ]; then
-		tag=$release_version
+		tag="$release_version"
 	else
-		print_error "Invalid argument "$1"."
+		print_error "Invalid argument '$1'."
 		exit 1
 	fi
 
 	checksum_file="dgraph-checksum-$platform-amd64".sha256
-	checksum_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$checksum_file
+	checksum_link=$( echo https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$checksum_file")
 	print_step "Downloading checksum file for ${tag} build."
 	if curl -L --progress-bar "$checksum_link" -o "/tmp/$checksum_file"; then
 		print_step "Download complete."
@@ -163,7 +163,7 @@ printf "%b" "$RESET"
 		exit 1;
 	fi
 
-	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/$checksum_file | grep -E -o '[a-zA-Z0-9]{64}')
+	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
 
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
@@ -182,7 +182,7 @@ printf "%b" "$RESET"
 		print_good "You already have Dgraph $tag installed."
 	else
 		tar_file=dgraph-$platform-amd64".tar.gz"
-		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/"$tag"/"$tar_file
+		dgraph_link="https://github.com/dgraph-io/dgraph/releases/download/$tag/"$tar_file
 
 		# Download and untar Dgraph binaries
 		if curl --output /dev/null --silent --head --fail "$dgraph_link"; then
@@ -196,9 +196,9 @@ printf "%b" "$RESET"
 		fi
 
 		print_step "Inflating binaries (password may be required).";
-		temp_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
-		tar -C $temp_dir -xzf /tmp/$tar_file
-		dgraphsum=$($digest_cmd $temp_dir/dgraph | awk '{print $1;}')
+		temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+		tar -C "$temp_dir" -xzf /tmp/"$tar_file"
+		dgraphsum=$($digest_cmd "$temp_dir"/dgraph | awk '{print $1;}')
 		if [ "$dgraph" != "$dgraphsum" ]; then
 			print_error "Downloaded binaries checksum doesn't match with latest versions checksum"
 			exit 1;
@@ -216,9 +216,9 @@ printf "%b" "$RESET"
 			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
 		fi
 
-		$sudo_cmd mv $temp_dir/* /usr/local/bin/.
-		rm "/tmp/"$tar_file;
-		rm -rf $temp_dir
+		$sudo_cmd mv "$temp_dir"/* /usr/local/bin/.
+		rm "/tmp/""$tar_file";
+		rm -rf "$temp_dir"
 
 		# Check installation
 		if hash dgraph 2>/dev/null; then
@@ -292,7 +292,7 @@ verify_system() {
 }
 
 trap exit_error EXIT
-for f in $@; do
+for f in "$@"; do
 	case $f in
 		'-y'|'--accept-license')
 			ACCEPT_LICENSE=y
