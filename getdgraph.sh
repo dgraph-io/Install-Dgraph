@@ -110,7 +110,8 @@ printf "%b" "$RESET"
 	fi
 
 	check_versions(){
-		toCompare="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/tags/"${release_version}" | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1 )"
+		toCompare=$(curl -s https://get.dgraph.io/latest | grep -o "${release_version}" | head -n1)
+
 			if [ "$release_version" == "$toCompare" ]; then
 			    return
 				else
@@ -123,13 +124,11 @@ printf "%b" "$RESET"
 	    # Environment variable is preferred over command-line argument
 	    release_version="${VERSION:-${argVersion}}"
 		check_versions
-	    echo "$release_version"
+	    print_step "Selected release version is $release_version."
     else
         release_version=$(curl -s https://get.dgraph.io/latest | grep -o '"tag_name": *"[^"]*' | grep -o '[^"]*$')
-	    echo $release_version
+	    print_step "Latest release version is $release_version."
     fi
-
-	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
