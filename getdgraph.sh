@@ -125,7 +125,7 @@ printf "%b" "$RESET"
 		check_versions
 	    echo $release_version
     else
-        release_version=$(curl -s http://get.dgraph.us/latest | grep -o '"tag_name": *"[^"]*' | grep -o '[^"]*$')
+        release_version=$(curl -s https://get.dgraph.io/latest | grep -o '"tag_name": *"[^"]*' | grep -o '[^"]*$')
 	    echo $release_version
     fi
 
