@@ -110,7 +110,7 @@ printf "%b" "$RESET"
 	fi
 
 	check_versions(){
-		toCompare="$(curl -s https://api.github.com/repos/dgraph-io/dgraph/releases/tags/${release_version} | grep "tag_name" | awk '{print $2}' | tr -dc '[:alnum:]-.\n\r' | head -n1 )"
+		toCompare=$(curl -s https://get.dgraph.io/latest | grep -o "${release_version}" | head -n1)
 			if [ "$release_version" == "$toCompare" ]; then
 			    continue
 				else
