@@ -1,4 +1,4 @@
-import {exists, writeJson} from "https://deno.land/std@0.51.0/fs/mod.ts";
+import {exists, writeJson} from "https://deno.land/std@0.64.0/fs/mod.ts";
 import {exec} from 'https://cdn.depjs.com/exec/mod.ts'
 
 let token: string = '';
