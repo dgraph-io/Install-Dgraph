@@ -123,13 +123,11 @@ printf "%b" "$RESET"
 	    # Environment variable is preferred over command-line argument
 	    release_version="${VERSION:-${argVersion}}"
 		check_versions
-	    echo $release_version
+	    print_step "Selected release version is $release_version."
     else
         release_version=$(curl -s https://get.dgraph.io/latest | grep -o '"tag_name": *"[^"]*' | grep -o '[^"]*$')
-	    echo $release_version
+	    print_step "Latest release version is $release_version."
     fi
-
-	print_step "Latest release version is $release_version."
 
 	platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
