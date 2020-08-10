@@ -296,8 +296,7 @@ setup_systemD() {
 		"" \
 		$systemdPath/dgraph-zero.service
 
-    rm "/tmp/""$tar_file";
-    rm -rf "$temp_dir"	
+    rm -rf "$tmplTemp"	
 
 	$sudo_cmd systemctl daemon-reload
 
