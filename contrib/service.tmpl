@@ -1,0 +1,17 @@
+[Unit]
+Description=${description}
+Wants=network.target
+After=network.target ${empty:-${afterService}} ${empty:-${requires}}
+
+[Service]
+Type=simple
+WorkingDirectory=/var/lib/dgraph
+ExecStart=${myShell} -c '${command}'
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+User=dgraph
+Group=dgraph
+
+[Install]
+WantedBy=multi-user.target ${empty:-${requiredBy}}
