@@ -247,7 +247,7 @@ render_template() {
   description=$1
   requires=$2
   requiredBy=$3
-  command=$4
+  cmd=$4
   afterService=$5
   render_template "$tmplTemp/service.tmpl" > $6
 }

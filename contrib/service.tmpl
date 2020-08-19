@@ -6,7 +6,7 @@ After=network.target ${empty:-${afterService}} ${empty:-${requires}}
 [Service]
 Type=simple
 WorkingDirectory=/var/lib/dgraph
-ExecStart=${myShell} -c '${command}'
+ExecStart=${myShell} -c '${cmd}'
 Restart=on-failure
 StandardOutput=journal
 StandardError=journal
