@@ -261,7 +261,7 @@ render_template() {
 setup_systemD() {
 
 	pathToTemplate="https://raw.githubusercontent.com/dgraph-io/Install-Dgraph/master/contrib"
-	systemdPath="/etc/systemd/system/"
+	systemdPath="/etc/systemd/system"
 	dgraphPath="/var/lib/dgraph"
 	tmplTemp="/tmp/dgraph"
 
