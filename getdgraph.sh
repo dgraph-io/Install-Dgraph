@@ -233,11 +233,10 @@ printf "%b" "$RESET"
 }
 
 addGroup() {
-	echo 'adding user and group' 1>&2
 	if id "dgraph" &>/dev/null; then
-	    echo 'user found - skipping'
+	    echo 'user found - skipping' 1>&2
 	else
-	echo 'user not found -  creating one...'
+	echo 'user not found -  creating one...' 1>&2
 	$sudo_cmd groupadd --system dgraph
 	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
 	fi
@@ -255,7 +254,7 @@ render_template() {
   requiredBy=$3
   cmd=$4
   afterService=$5
-  render_template "$tmplTemp/service.tmpl" > $6
+  render_template "$tmplTemp/service.tmpl"| $sudo_cmd tee $6 > /dev/null
 }
 
 setup_systemD() {
@@ -302,7 +301,7 @@ setup_systemD() {
 		"" \
 		$systemdPath/dgraph-zero.service
 
-    rm -rf "$tmplTemp"	
+    $sudo_cmd rm -rf "$tmplTemp"	
 
 	$sudo_cmd systemctl daemon-reload
 
@@ -365,6 +364,6 @@ done
 install_dgraph "$@"
 
 if [ "$INSTALL_IN_SYSTEMD" = "y" ]; then
-		echo "Systemd installation was requested."
-		addGroup | setup_systemD
+	echo "Systemd installation was requested."
+	addGroup | setup_systemD
 fi
