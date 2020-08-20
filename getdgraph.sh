@@ -28,6 +28,7 @@ ACCEPT_LICENSE=${acceptLower:-n}
 INSTALL_IN_SYSTEMD=${systemdLower:-n}
 sudo_cmd=""
 argVersion=
+myShell=$(which bash)
 
 print_instruction() {
     printf '%b\n' "$BOLD$1$RESET"
@@ -237,29 +238,68 @@ addGroup() {
 	exit 0
 }
 
+render_template() {
+  eval "echo \"$(cat $1)\""
+}
+
+ gen() {
+  empty=''
+  description=$1
+  requires=$2
+  requiredBy=$3
+  cmd=$4
+  afterService=$5
+  render_template "$tmplTemp/service.tmpl" > $6
+}
+
 setup_systemD() {
 
-	pathToFiles="https://raw.githubusercontent.com/dgraph-io/dgraph/master/contrib/systemd/centos"
+	pathToTemplate="https://raw.githubusercontent.com/dgraph-io/Install-Dgraph/master/contrib"
 	systemdPath="/etc/systemd/system/"
 	dgraphPath="/var/lib/dgraph"
+	tmplTemp="/tmp/dgraph"
 
 	$sudo_cmd mkdir -p $dgraphPath
 	$sudo_cmd mkdir -p $dgraphPath/{p,w,zw}
 	$sudo_cmd mkdir -p /var/log/dgraph
-
 	$sudo_cmd chown -R dgraph:dgraph /var/{lib,log}/dgraph
+	$sudo_cmd mkdir -p $tmplTemp
 
-	_alpha="$pathToFiles/dgraph-alpha.service"
-	_zero="$pathToFiles/dgraph-zero.service"
-	_ui="$pathToFiles/dgraph-ui.service"
-	_addAccount="$pathToFiles/add_dgraph_account.sh"
+	_getTmpl="$pathToTemplate/service.tmpl"
 
-	$sudo_cmd curl -LJ --progress-bar "$_alpha" -o "$systemdPath/dgraph-alpha.service"
-	$sudo_cmd curl -LJ --progress-bar "$_zero" -o "$systemdPath/dgraph-zero.service"
-	$sudo_cmd curl -LJ --progress-bar "$_ui" -o "$systemdPath/dgraph-ui.service"
+	$sudo_cmd curl -LJ --progress-bar "$_getTmpl" -o "$tmplTemp/service.tmpl"
+
+	echo "#### Creating dgraph-ui.service ..."
+
+	gen "dgraph.io Web UI" \
+		"" \
+		"" \
+		"dgraph-ratel" \
+		"" \
+		$systemdPath/dgraph-ui.service
+
+	echo "#### Creating dgraph-alpha.service ..."
+
+	gen "dgraph.io Alpha instance" \
+		"\nRequires=dgraph-zero.service" \
+		"" \
+		"dgraph alpha --lru_mb 2048 -p /var/lib/dgraph/p -w /var/lib/dgraph/w" \
+		"dgraph-zero.service" \
+		$systemdPath/dgraph-alpha.service
+
+	echo "#### Creating dgraph-zero.service ..."
+
+	gen "dgraph.io Zero instance" \
+		"" \
+		"\nRequiredBy=dgraph-alpha.service" \
+		"dgraph zero --wal /var/lib/dgraph/zw" \
+		"" \
+		$systemdPath/dgraph-zero.service
+
+    rm -rf "$tmplTemp"	
 
 	$sudo_cmd systemctl daemon-reload
-	
+
 	$sudo_cmd systemctl enable dgraph-alpha
 	$sudo_cmd systemctl start dgraph-alpha
 
