@@ -233,9 +233,15 @@ printf "%b" "$RESET"
 }
 
 addGroup() {
+	echo 'adding user and group' 1>&2
+	if id "dgraph" &>/dev/null; then
+	    echo 'user found - skipping'
+	else
+	echo 'user not found -  creating one...'
 	$sudo_cmd groupadd --system dgraph
 	$sudo_cmd useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
-	exit 0
+	fi
+	true
 }
 
 render_template() {
@@ -281,7 +287,7 @@ setup_systemD() {
 	echo "#### Creating dgraph-alpha.service ..."
 
 	gen "dgraph.io Alpha instance" \
-		"\nRequires=dgraph-zero.service" \
+		"Requires=dgraph-zero.service" \
 		"" \
 		"dgraph alpha --lru_mb 2048 -p /var/lib/dgraph/p -w /var/lib/dgraph/w" \
 		"dgraph-zero.service" \
@@ -291,7 +297,7 @@ setup_systemD() {
 
 	gen "dgraph.io Zero instance" \
 		"" \
-		"\nRequiredBy=dgraph-alpha.service" \
+		"RequiredBy=dgraph-alpha.service" \
 		"dgraph zero --wal /var/lib/dgraph/zw" \
 		"" \
 		$systemdPath/dgraph-zero.service
@@ -305,6 +311,8 @@ setup_systemD() {
 
 	$sudo_cmd systemctl enable dgraph-ui
 	$sudo_cmd systemctl start dgraph-ui
+
+	true
 
 }
 
