@@ -324,14 +324,14 @@ function exit_error {
 verify_system() {
     if [ -x /sbin/openrc-run ]; then
         HAS_OPENRC=true
-        print_error "Sorry we don't support OpenRC for now"
-        return 1
+        print_error "Sorry we don't support OpenRC for now."
+		rint_good "But you can install Dgraph, remove the flag and try again."
+        exit 1
     fi
-    if [ -d /run/systemd ]; then
-        HAS_SYSTEMD=true
-		print_good 'Habemus SYSTEMD'
+    if hash systemd 2>/dev/null; then
+		print_good "Habemus SYSTEMD."
 		INSTALL_IN_SYSTEMD="y"
-        return
+        return 0
     fi
     print_error "Systemd was not found."
     return 1
@@ -344,7 +344,7 @@ for f in "$@"; do
 			ACCEPT_LICENSE=y
 			;;
 		'-s'|'--systemd')
-			INSTALL_IN_SYSTEMD="y"
+			verify_system
 			;;
 		'-v='*|'--version='*)
 			argVersion=${f#*=}
