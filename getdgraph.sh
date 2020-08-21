@@ -328,12 +328,13 @@ verify_system() {
 		rint_good "But you can install Dgraph, remove the flag and try again."
         exit 1
     fi
-    if hash systemd 2>/dev/null; then
+    if hash systemctl 2>/dev/null; then
 		print_good "Habemus SYSTEMD."
 		INSTALL_IN_SYSTEMD="y"
         return 0
     fi
     print_error "Systemd was not found."
+	rint_good "But you can install Dgraph, remove the flag and try again."
     return 1
 }
 
