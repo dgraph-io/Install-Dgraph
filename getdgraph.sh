@@ -317,7 +317,7 @@ setup_systemD() {
 
 function exit_error {
   if [ "$?" -ne 0 ]; then
-    print_error "There was some problem while installing Dgraph. Please share the output of this script with us on https://dgraph.slack.com or https://discuss.dgraph.io so that we can resolve the issue for you."
+    print_error "There was some problem while installing Dgraph. Please share the output of this script with us on https://discuss.dgraph.io so that we can resolve the issue for you."
   fi
 }
 
