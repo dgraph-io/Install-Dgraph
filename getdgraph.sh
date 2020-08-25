@@ -325,7 +325,7 @@ verify_system() {
     if [ -x /sbin/openrc-run ]; then
         HAS_OPENRC=true
         print_error "Sorry we don't support OpenRC for now."
-		rint_good "But you can install Dgraph, remove the flag and try again."
+		print_good "But you can install Dgraph, remove the flag and try again."
         exit 1
     fi
     if hash systemctl 2>/dev/null; then
@@ -366,5 +366,5 @@ install_dgraph "$@"
 
 if [ "$INSTALL_IN_SYSTEMD" = "y" ]; then
 	echo "Systemd installation was requested."
-	addGroup | setup_systemD
+	addGroup && setup_systemD
 fi
