@@ -220,7 +220,7 @@ function check_if_exists {
 	} catch {
 		$StatusCode = $_.Exception.Response.StatusCode.value__
 		Write-Error "INTERNAL :: HTTP Status Code $StatusCode"
-		Write-Error "This version doesn't exist or it is a typo (Tip: You need to add 'v' eg: v20.0.1-rc1)"
+		Write-Error "This version doesn't exist or it is a typo (Tip: You need to add 'v' eg: v20.07.2)"
 		break
 	}
 	if ($Response) {

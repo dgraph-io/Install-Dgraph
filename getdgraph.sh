@@ -338,6 +338,13 @@ verify_system() {
     return 1
 }
 
+print_usage() {
+	echo "Usage:"
+	echo "	-v='' | --version='v20.07.2'	: Choose Dgraph's version manually."
+	echo "	-s    | --systemd		: Install Dgraph as a service."
+	echo "	-y    | --accept-license	: Automatically agree to the terms of the Dgraph Community License."
+}
+
 trap exit_error EXIT
 for f in "$@"; do
 	case $f in
@@ -350,12 +357,13 @@ for f in "$@"; do
 		'-v='*|'--version='*)
 			argVersion=${f#*=}
 			;;
+		'-h'|'--help')
+			print_usage
+			exit 0
+			;;
 		*)
 			print_error "unknown option $1"
-				echo "Usage:"
-				echo "	-v='' | --version='2.0.1'       : Choose Dgraph's version manually."
-				echo "	-s    | --systemd               : Install Dgraph as a service."
-				echo "	-y    | --accept-license        : Automatically agree to the terms of the Dgraph Community License."
+			print_usage
 			exit 1
 			;;
 	esac
