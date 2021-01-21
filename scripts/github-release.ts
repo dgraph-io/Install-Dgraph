@@ -104,22 +104,30 @@ const update_latest_release = async (token: string) => {
     await callGithub(token);
 
     let data = list.nodes.sort((a, b) => b.tagName.localeCompare(a.tagName));
-    console.log(data);
 
     let Be = /beta/g;
     let RC = /-rc/g;
-    let CalVer = /v20./g;
+    let CalVer = /v(?<![0-9])[0-9]{2}(?![0-9])./g;
 
     let latestBeta = data.filter((e) => e.tagName.match(Be));
     let latestRC = data.filter((e) => e.tagName.match(RC));
     let latestCalVer = data.filter((e) =>
       (e.tagName.match(CalVer) && !e.tagName.match(RC)) && !e.tagName.match(Be)
     );
+    let releases = latestCalVer.map((e) => {
+      const splits = e.tagName.split(".");
+      splits.pop();
+      let JOK = splits.join(".");
+      return JOK;
+    });
+
+    const uniqueSet = new Set(releases);
+    const majorReleases = [...uniqueSet];
     let tag_name = latestCalVer[0].tagName;
 
     writeJson(
       "./latest-release.txt",
-      { latestBeta, latestRC, latestCalVer, tag_name },
+      { latestBeta, latestRC, latestCalVer, tag_name, majorReleases },
     );
   } catch (error) {
     throw error;
