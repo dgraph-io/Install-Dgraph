@@ -111,19 +111,40 @@ const update_latest_release = async (token: string) => {
 
     let latestBeta = data.filter((e) => e.tagName.match(Be));
     let latestRC = data.filter((e) => e.tagName.match(RC));
-    let latestCalVer = data.filter((e) =>
+    let calVer = data.filter((e) =>
       (e.tagName.match(CalVer) && !e.tagName.match(RC)) && !e.tagName.match(Be)
     );
-    let releases = latestCalVer.map((e) => {
+    let releases = calVer.map((e) => {
       const splits = e.tagName.split(".");
       splits.pop();
       let JOK = splits.join(".");
       return JOK;
     });
+    JSON.parse;
 
     const uniqueSet = new Set(releases);
     const majorReleases = [...uniqueSet];
-    let tag_name = latestCalVer[0].tagName;
+    let tag_name = calVer[0].tagName;
+
+    let latestCalVer: any = calVer.map((e: any) => {
+      const setMax = (a: any) =>
+        calVer.filter((e: any) => e.tagName.match(a)).reduce((
+          prev: any,
+          current: any,
+        ) => prev.tagName > current.tagName ? prev : current);
+
+      let getLatestForMajor = majorReleases.map(function (item: any) {
+        if (!!e.tagName.match(item)) {
+          return setMax(item);
+        }
+      }).filter((e) => e);
+
+      return {
+        tagName: e.tagName,
+        isDraft: e.isDraft,
+        latest: getLatestForMajor[0]?.tagName,
+      };
+    });
 
     writeJson(
       "./latest-release.txt",
