@@ -29,6 +29,7 @@ INSTALL_IN_SYSTEMD=${systemdLower:-n}
 sudo_cmd=""
 argVersion=
 myShell=$(which bash)
+platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
 print_instruction() {
     printf '%b\n' "$BOLD$1$RESET"
@@ -130,8 +131,6 @@ printf "%b" "$RESET"
         release_version=$(curl -s https://get.dgraph.io/latest | grep -o '"tag_name": *"[^"]*' | grep -o '[^"]*$')
 	    print_step "Latest release version is $release_version."
     fi
-
-	platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
 	digest_cmd=""
 	if hash shasum 2>/dev/null; then
@@ -334,7 +333,7 @@ verify_system() {
         return 0
     fi
     print_error "Systemd was not found."
-	rint_good "But you can install Dgraph, remove the flag and try again."
+	print_good "Wrong OS?? you still can install Dgraph(Linux only), remove the flag and try again or build from the source."
     return 1
 }
 
@@ -344,6 +343,13 @@ print_usage() {
 	echo "	-s    | --systemd		: Install Dgraph as a service."
 	echo "	-y    | --accept-license	: Automatically agree to the terms of the Dgraph Community License."
 }
+
+REGX=$(echo $@ | sed -n '/v/p')
+
+if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
+	     print_error "Sorry, we don't have new binaries for this platform anymore. Please build from source."
+	     exit 1;
+	fi
 
 trap exit_error EXIT
 for f in "$@"; do
