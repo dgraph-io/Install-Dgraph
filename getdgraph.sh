@@ -348,6 +348,8 @@ REGX=$(echo $@ | sed -n '/v/p')
 
 if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
 	     print_error "Sorry, we don't have new binaries for this platform anymore. Please build from source."
+		 print_good  "if you wanna install some old version. You can still install it if you use the flag -v plus the desired version."
+		 print_good  "Note that it will fail if you choose the wrong version for your OS(unsupported OS)"
 	     exit 1;
 	fi
 
