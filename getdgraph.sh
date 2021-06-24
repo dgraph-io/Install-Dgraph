@@ -28,7 +28,6 @@ ACCEPT_LICENSE=${acceptLower:-n}
 INSTALL_IN_SYSTEMD=${systemdLower:-n}
 sudo_cmd=""
 argVersion=
-myShell=$(which bash)
 platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
 print_instruction() {
@@ -189,7 +188,7 @@ printf "%b" "$RESET"
 			curl -L --progress-bar "$dgraph_link" -o "/tmp/$tar_file"
 			print_good "Download complete."
 		else
-			print_error "Sorry. Binaries not available for your platform. Please compile manually: https://dgraph.io/docs/deploy/#building-from-source"
+			print_error "Sorry. There was an issue when downloading $dgraph_link. Binaries not available for your platform. Please compile manually: https://dgraph.io/docs/deploy/#building-from-source"
 			echo
 			exit 1;
 		fi
@@ -208,7 +207,7 @@ printf "%b" "$RESET"
 
 		# Backup existing dgraph binaries in HOME directory
 		if hash dgraph 2>/dev/null; then
-			dgraph_path="$(which dgraph)"
+			dgraph_path="$(command -v, dgraph)"
 			dgraph_backup="dgraph_backup_olderversion"
 			print_step "Backing up older versions in ~/$dgraph_backup (password may be required)."
 			mkdir -p ~/$dgraph_backup
