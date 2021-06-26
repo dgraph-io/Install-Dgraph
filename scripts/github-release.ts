@@ -1,5 +1,5 @@
 import { exists, writeJson } from "https://deno.land/std@0.64.0/fs/mod.ts";
-import { exec } from "https://cdn.depjs.com/exec/mod.ts";
+import { exec } from "https://deno.land/x/exec/mod.ts";
 
 let token: string = "";
 let rebuild: boolean = false;
@@ -159,14 +159,9 @@ const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const execSYS = async ({ Entrypoint, command, path }: execSYSOptions) => {
   try {
-    return await exec({
-      cmd: [
-        `${Entrypoint}`,
-        "-c",
-        `${command}`,
-      ],
-      cwd: `${path ? path : "./"}`,
-    });
+    return await exec(
+      `${command}`
+    );
   } catch (error) {
     console.log(error);
   }
@@ -212,8 +207,8 @@ const rebuildIt = async () => {
   await execSYS({ Entrypoint: "sh", command: "rm -rf ./Install-Dgraph_build" });
 
   console.log(await exec("deno -V"));
-  console.log(await exec(["which", "deno"]));
-  console.log(await exec(["which", "git"]));
+  console.log(await exec("which deno"));
+  console.log(await exec("which git"));
 };
 
 if (rebuild) {
