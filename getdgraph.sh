@@ -207,7 +207,7 @@ printf "%b" "$RESET"
 
 		# Backup existing dgraph binaries in HOME directory
 		if hash dgraph 2>/dev/null; then
-			dgraph_path="$(command -v, dgraph)"
+			dgraph_path="$(command -v dgraph)"
 			dgraph_backup="dgraph_backup_olderversion"
 			print_step "Backing up older versions in ~/$dgraph_backup (password may be required)."
 			mkdir -p ~/$dgraph_backup
