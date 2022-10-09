@@ -106,7 +106,7 @@ const update_latest_release = async (token: string) => {
     let data = list.nodes.sort((a, b) => b.tagName.localeCompare(a.tagName));
 
     let Be = /beta/g;
-    let RC = /-rc/g;
+    let RC = /-rc|RC/g;
     let CalVer = /v(?<![0-9])[0-9]{2}(?![0-9])./g;
 
     let latestBeta = data.filter((e) => e.tagName.match(Be));
@@ -124,7 +124,7 @@ const update_latest_release = async (token: string) => {
 
     const uniqueSet = new Set(releases);
     const majorReleases = [...uniqueSet];
-    let tag_name = calVer[0].tagName;
+    let tag_name = calVer[0].tagName = "v21.12.0" ? calVer[1].tagName : calVer[0].tagName;
 
     let latestCalVer: any = calVer.map((e: any) => {
       const setMax = (a: any) =>
