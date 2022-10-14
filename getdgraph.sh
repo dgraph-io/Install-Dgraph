@@ -346,14 +346,16 @@ print_usage() {
 REGX=$(echo $@ | sed -n '/v/p')
 
 old_OS() {
-	if [ ! "$argVersion" ]; then
-		read -p 'Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021)  [Y/n] ' response < /dev/tty
-		[[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
-		argVersion="v20.11.3"
-	else
-		echo 'Manually configured version. Hope you know that we only support versions below v20.11.3.'
-		print_good "Continuing".
-	fi
+    if [[ ${VERSION} ]] || [[ ${argVersion} ]]; then
+        echo 'Manually configured version. Hope you know that we only support versions below v20.11.3'
+        print_good "Continuing wait 3 sec...".
+        sleep 3
+        return 0
+    else
+        read -p 'Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021)  [Y/n] ' response < /dev/tty
+        [[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
+        argVersion="v20.11.3"
+    fi
 }
 check_platform() {
 if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
