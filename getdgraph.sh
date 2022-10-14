@@ -349,13 +349,15 @@ if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
 	     print_error "Sorry, we don't have new binaries for this platform since Jun 18 2021. Please build from source."
 		 print_good  "if you wanna install some old version. You can still install it if you use the flag -v plus the desired version."
 		 print_good  "Note that it will fail if you choose the wrong version for your OS(unsupported OS)"
-	     echo "Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021)"
-			select yn in "Yes" "No"; do
-				case $yn in
-					Yes ) argVersion="v20.11.3"; break;;
-					No ) exit 1;;
-				esac
-			done
+
+		while true; do
+			read -p "Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021) " yn
+			case $yn in
+				[Yy]* ) argVersion="v20.11.3"; break;;
+				[Nn]* ) exit 1;;
+				* ) echo "Please answer yes or no.";;
+			esac
+		done
 	fi
 
 trap exit_error EXIT
