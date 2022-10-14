@@ -345,19 +345,22 @@ print_usage() {
 
 REGX=$(echo $@ | sed -n '/v/p')
 
+old_OS() {
+	if [ ! "$argVersion" ]; then
+		read -p 'Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021)  [Y/n] ' response < /dev/tty
+		[[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
+		argVersion="v20.11.3"
+	else
+		echo 'Manually configured version. Hope you know that we only support versions below v20.11.3.'
+		print_good "Continuing".
+	fi
+}
+
 if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
 	     print_error "Sorry, we don't have new binaries for this platform since Jun 18 2021. Please build from source."
 		 print_good  "if you wanna install some old version. You can still install it if you use the flag -v plus the desired version."
 		 print_good  "Note that it will fail if you choose the wrong version for your OS(unsupported OS)"
-
-		while true; do
-			read -p "Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021) " yn
-			case $yn in
-				[Yy]* ) argVersion="v20.11.3"; break;;
-				[Nn]* ) exit 1;;
-				* ) echo "Please answer yes or no.";;
-			esac
-		done
+		 old_OS
 	fi
 
 trap exit_error EXIT
