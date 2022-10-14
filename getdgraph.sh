@@ -355,13 +355,14 @@ old_OS() {
 		print_good "Continuing".
 	fi
 }
-
+check_platform() {
 if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
 	     print_error "Sorry, we don't have new binaries for this platform since Jun 18 2021. Please build from source."
 		 print_good  "if you wanna install some old version. You can still install it if you use the flag -v plus the desired version."
 		 print_good  "Note that it will fail if you choose the wrong version for your OS(unsupported OS)"
 		 old_OS
 	fi
+}
 
 trap exit_error EXIT
 for f in "$@"; do
@@ -387,6 +388,8 @@ for f in "$@"; do
 	esac
 	shift
 done
+
+check_platform
 
 install_dgraph "$@"
 
