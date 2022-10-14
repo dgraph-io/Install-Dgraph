@@ -345,12 +345,26 @@ print_usage() {
 
 REGX=$(echo $@ | sed -n '/v/p')
 
+old_OS() {
+    if [[ ${VERSION} ]] || [[ ${argVersion} ]]; then
+        echo 'Manually configured version. Hope you know that we only have built assets for versions below v20.11.3'
+        print_good "Continuing wait 3 sec...".
+        sleep 3
+        return 0
+    else
+        read -p 'Do you wish to install an older version? The version v20.11.3 - (Tenacious T’Challa - 3 | Mar 31 2021)  [Y/n] ' response < /dev/tty
+        [[ "x$response" == "x" || "$response" == [yY] || "$response" == [yY][eE][sS] ]] || return 1
+        argVersion="v20.11.3"
+    fi
+}
+check_platform() {
 if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
-	     print_error "Sorry, we don't have new binaries for this platform anymore. Please build from source."
+	     print_error "Sorry, we don't have new binaries for this platform since Jun 18 2021. Please build from source."
 		 print_good  "if you wanna install some old version. You can still install it if you use the flag -v plus the desired version."
 		 print_good  "Note that it will fail if you choose the wrong version for your OS(unsupported OS)"
-	     exit 1;
+		 old_OS
 	fi
+}
 
 trap exit_error EXIT
 for f in "$@"; do
@@ -376,6 +390,8 @@ for f in "$@"; do
 	esac
 	shift
 done
+
+check_platform
 
 install_dgraph "$@"
 
