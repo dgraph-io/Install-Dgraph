@@ -347,7 +347,7 @@ REGX=$(echo $@ | sed -n '/v/p')
 
 old_OS() {
     if [[ ${VERSION} ]] || [[ ${argVersion} ]]; then
-        echo 'Manually configured version. Hope you know that we only support versions below v20.11.3'
+        echo 'Manually configured version. Hope you know that we only have built assets for versions below v20.11.3'
         print_good "Continuing wait 3 sec...".
         sleep 3
         return 0
