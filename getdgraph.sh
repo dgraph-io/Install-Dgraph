@@ -127,7 +127,7 @@ printf "%b" "$RESET"
 			if [ "$release_version" == "$toCompare" ]; then
 			    return
 				else
-				print_error "This version doesn't exist or it is a typo (Tip: You need to add \"v\" eg: v2.0.0-rc1)"
+				print_error "This version doesn't exist or it is a typo (Tip: You need to add \"v\" eg: v22.0.0-RC1-20221003)"
 				exit 1
 			fi
 	}
@@ -353,7 +353,7 @@ verify_system() {
 
 print_usage() {
 	echo "Usage:"
-	echo "	-v='' | --version='v20.07.2'	: Choose Dgraph's version manually."
+	echo "	-v='' | --version='v22.0.0' 	: Choose Dgraph's version manually."
 	echo "	-d    | --download             	: Download the binary to the current path."
 	echo "	-s    | --systemd             	: Install Dgraph as a service."
 	echo "	-y    | --accept-license	    : Automatically agree to the terms of the Dgraph Community License."

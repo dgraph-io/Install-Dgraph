@@ -45,14 +45,18 @@ Add `-s --` before the flags.
 
 >`-y | --accept-license`: Automatically agree to the terms of the Dgraph Community License (default: “n”).
 
+>`-d | --download`: Download Dgraph's binary to the current path only. No globally installation. (default: “n”).
+
 >`-s | --systemd`: Automatically create Dgraph’s installation as Systemd services (default: “n”).
 
->`-v | --version`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v20.03.1-beta1 or -rc1).
+>`-v | --version`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v22.0.0-RC1-20221003 or -rc2).
 
 
 ## Environment Variables
 
 >`ACCEPT_LICENSE`: Automatically agree to the terms of the Dgraph Community License (default: “n”).
+
+>`JUST_DOWNLOAD`: Download Dgraph's binary to the current path only. No globally installation. (default: “n”).
 
 >`INSTALL_IN_SYSTEMD`: Automatically create Dgraph’s installation as Systemd services (default: “n”).
 
@@ -85,7 +89,7 @@ iwr https://get.dgraph.io/windows -useb | iex
 With Environment Variables:
 
 ```shell
-$Version="v20.03.1"; $acceptLicense="yes"; iwr http://get.dgraph.io/windows -useb | iex
+$Version="v22.00.1"; $acceptLicense="yes"; iwr http://get.dgraph.io/windows -useb | iex
 ```
 
 Download the script and run locally
@@ -97,7 +101,7 @@ iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1
 Run locally with flags
 
 ```shell
-iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1 -version v20.03.1 -acceptLicense yes
+iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1 -version v22.00.1 -acceptLicense yes
 ```
 
 ## Flags
@@ -110,7 +114,7 @@ iwr http://get.dgraph.io/windows -useb -outf install.ps1; .\install.ps1 -version
 
 >`$Version="v20.03.1"`: Choose Dgraph’s version manually (default: The latest stable release).
 
->`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v2.0.0-beta1 or -rc1).
+>`$acceptLicense="yes"`: Choose Dgraph’s version manually (default: The latest stable release, you can do tag combinations e.g v22.0.0-RC1-20221003 or -rc2).
 
 ## Compatibility
 
