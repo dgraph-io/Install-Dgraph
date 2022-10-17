@@ -23,9 +23,12 @@ RESET='\033[0m'
 
 acceptLower=$(echo "$ACCEPT_LICENSE" | dd  conv=lcase 2> /dev/null)
 systemdLower=$(echo "$INSTALL_IN_SYSTEMD" | dd  conv=lcase 2> /dev/null)
+downloadLower=$(echo "$JUST_DOWNLOAD" | dd  conv=lcase 2> /dev/null)
 
 ACCEPT_LICENSE=${acceptLower:-n}
 INSTALL_IN_SYSTEMD=${systemdLower:-n}
+JUST_DOWNLOAD=${downloadLower:-n}
+
 sudo_cmd=""
 argVersion=
 platform="$(uname | tr '[:upper:]' '[:lower:]')"
@@ -82,8 +85,6 @@ cat << "EOF"
 EOF
 printf "%b" "$RESET"
 
-	install_path="/usr/local/bin"
-
 	# Check curl is installed
 	if ! hash curl 2>/dev/null; then
 		print_error "Could not find curl. Please install curl and try again.";
@@ -95,6 +96,12 @@ printf "%b" "$RESET"
 		exit 1;
 	fi
 
+	if [ "$JUST_DOWNLOAD" = "y" ]; then
+		install_path="./"
+	else
+
+	install_path="/usr/local/bin"
+
 	# Check sudo permissions
 	if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
@@ -104,6 +111,10 @@ printf "%b" "$RESET"
 			exit 1;
 		fi
 	fi
+		# Create /usr/local/bin directory if it doesn't exist.
+		$sudo_cmd mkdir -p $install_path
+fi
+
 
 	if ! check_license_agreement; then
 		print_error 'You must agree to the license terms to install Dgraph.'
@@ -161,7 +172,7 @@ printf "%b" "$RESET"
 		exit 1;
 	fi
 
-	dgraph=$(grep -m 1 /usr/local/bin/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
+	dgraph=$(grep -m 1 $install_path/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
 
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
@@ -170,8 +181,8 @@ printf "%b" "$RESET"
 
 	print_step "Comparing checksums for dgraph binaries"
 
-	if $digest_cmd /usr/local/bin/dgraph &>/dev/null; then
-		dgraphsum=$($digest_cmd /usr/local/bin/dgraph | grep -E -o '[a-zA-Z0-9]{64}')
+	if $digest_cmd $install_path/dgraph &>/dev/null; then
+		dgraphsum=$($digest_cmd $install_path/dgraph | grep -E -o '[a-zA-Z0-9]{64}')
 	else
 		dgraphsum=""
 	fi
@@ -202,9 +213,6 @@ printf "%b" "$RESET"
 			exit 1;
 		fi
 
-		# Create /usr/local/bin directory if it doesn't exist.
-		$sudo_cmd mkdir -p /usr/local/bin
-
 		# Backup existing dgraph binaries in HOME directory
 		if hash dgraph 2>/dev/null; then
 			dgraph_path="$(command -v dgraph)"
@@ -214,13 +222,13 @@ printf "%b" "$RESET"
 			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
 		fi
 
-		$sudo_cmd mv "$temp_dir"/* /usr/local/bin/.
+		$sudo_cmd mv "$temp_dir"/* $install_path/.
 		rm "/tmp/""$tar_file";
 		rm -rf "$temp_dir"
 
 		# Check installation
 		if hash dgraph 2>/dev/null; then
-			print_good "Dgraph binaries $tag have been installed successfully in /usr/local/bin.";
+			print_good "Dgraph binaries $tag have been installed successfully in $install_path.";
 		else
 			print_error "Installation failed. Please try again.";
 			exit 1;
@@ -339,8 +347,9 @@ verify_system() {
 print_usage() {
 	echo "Usage:"
 	echo "	-v='' | --version='v20.07.2'	: Choose Dgraph's version manually."
-	echo "	-s    | --systemd		: Install Dgraph as a service."
-	echo "	-y    | --accept-license	: Automatically agree to the terms of the Dgraph Community License."
+	echo "	-d    | --download             	: Download the binary to the current path."
+	echo "	-s    | --systemd             	: Install Dgraph as a service."
+	echo "	-y    | --accept-license	    : Automatically agree to the terms of the Dgraph Community License."
 }
 
 REGX=$(echo $@ | sed -n '/v/p')
@@ -377,6 +386,9 @@ for f in "$@"; do
 			;;
 		'-v='*|'--version='*)
 			argVersion=${f#*=}
+			;;
+		'-d'|'--download')
+			JUST_DOWNLOAD=y
 			;;
 		'-h'|'--help')
 			print_usage
