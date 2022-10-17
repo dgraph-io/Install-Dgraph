@@ -5,9 +5,9 @@ This repository is home to the installation scripts that you find at `https://ge
 Works for:
 
 * :white_check_mark: Ubuntu 16.04 and above 
-* :white_check_mark: macOS Sierra and above
-* :white_check_mark: Windows 10 and above
-* :white_check_mark: Windows Server 2016 above
+* :x: macOS Sierra and above
+* :x: Windows 10 and above
+* :x: Windows Server 2016 above
 
 <!-- Todo: Add Windows Version with Powershell version tested. -->
 <!-- Todo: Add Systemd references. -->
@@ -15,6 +15,8 @@ Works for:
 # Install Dgraph on Linux and macOS
 
 <!-- Todo: Add Brew formula here. -->
+
+> macOS is no longer supported (for now), you can only install old versions.
 
 ### Using Shell
 
@@ -58,6 +60,8 @@ Add `-s --` before the flags.
 
 
 # Install Dgraph on Windows
+
+> No longer supported (for now).
 
 ### Using Powershell
 
