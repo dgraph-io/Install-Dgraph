@@ -97,23 +97,23 @@ printf "%b" "$RESET"
 	fi
 
 	if [ "$JUST_DOWNLOAD" = "y" ]; then
-		install_path="./"
-	else
+		install_path="."
+	  else
 
-	install_path="/usr/local/bin"
+	  install_path="/usr/local/bin"
 
-	# Check sudo permissions
-	if hash sudo 2>/dev/null; then
+	  # Check sudo permissions
+	  if hash sudo 2>/dev/null; then
 		sudo_cmd="sudo"
 		echo "Requires sudo permission to install Dgraph binaries to $install_path."
 		if ! $sudo_cmd -v; then
 			print_error "Need sudo privileges to complete installation."
 			exit 1;
 		fi
-	fi
+	  fi
 		# Create /usr/local/bin directory if it doesn't exist.
 		$sudo_cmd mkdir -p $install_path
-fi
+    fi
 
 
 	if ! check_license_agreement; then
@@ -172,7 +172,7 @@ fi
 		exit 1;
 	fi
 
-	dgraph=$(grep -m 1 $install_path/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
+	dgraph=$(grep -m 1 "$install_path"/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
 
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
@@ -213,6 +213,12 @@ fi
 			exit 1;
 		fi
 
+        
+	if [ "$JUST_DOWNLOAD" = "y" ]; then
+		print_instruction "----------------------------- Dgraph -----------------------------------"
+		print_instruction "Downloading badger and dgraph locally only. Please move the binaries to your desired location."
+		print_instruction "----------------------------- Dgraph -----------------------------------"
+    	else
 		# Backup existing dgraph binaries in HOME directory
 		if hash dgraph 2>/dev/null; then
 			dgraph_path="$(command -v dgraph)"
@@ -221,8 +227,9 @@ fi
 			mkdir -p ~/$dgraph_backup
 			$sudo_cmd mv $dgraph_path* ~/$dgraph_backup/.
 		fi
-
-		$sudo_cmd mv "$temp_dir"/* $install_path/.
+    fi
+        
+		$sudo_cmd mv "$temp_dir"/* $install_path/
 		rm "/tmp/""$tar_file";
 		rm -rf "$temp_dir"
 
