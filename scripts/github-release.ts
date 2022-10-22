@@ -124,7 +124,7 @@ const update_latest_release = async (token: string) => {
 
     const uniqueSet = new Set(releases);
     const majorReleases = [...uniqueSet];
-    let tag_name = calVer[0].tagName = "v21.12.0" ? calVer[1].tagName : calVer[0].tagName;
+    let tag_name = calVer[0].tagName == "v21.12.0" ? calVer[1].tagName : "v21.03.2"
 
     let latestCalVer: any = calVer.map((e: any) => {
       const setMax = (a: any) =>
