@@ -13,7 +13,8 @@
 #
 # This should work on Mac, Linux, and BSD systems.
 
-set -e
+set -eE
+set -o functrace
 
 DIM='\033[2m'
 BOLD='\033[1m'
@@ -382,7 +383,15 @@ if  [[  -z $REGX  &&  "$platform" == "darwin" ]]; then
 	fi
 }
 
+failure() {
+  local lineno=$1
+  local msg=$2
+  print_error "Failed at $lineno: $msg"
+}
+
+trap 'failure ${LINENO} "$BASH_COMMAND" ${exit_error}' ERR
 trap exit_error EXIT
+
 for f in "$@"; do
 	case $f in
 		'-y'|'--accept-license')
