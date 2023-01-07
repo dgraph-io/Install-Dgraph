@@ -175,11 +175,11 @@ printf "%b" "$RESET"
 
 	if grep -Fxq "$install_path"/dgraph /tmp/"$checksum_file"
 	then
-		# for versions < 22, old team was hardcoding install paths in SHA file
+		# for versions < 22, the install path is present in the SHA file
 		# example file from release v21.03.2 https://github.com/dgraph-io/dgraph/releases/download/v21.03.2/dgraph-checksum-linux-amd64.sha256
 		dgraph=$(grep -m 1 "$install_path"/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
 	else
-		# for versions >= 22, new team does not enforce install paths in SHA file
+		# for versions >= 22, the install path is NOT present in the SHA file
 		# example file from release v22.0.2 https://github.com/dgraph-io/dgraph/releases/download/v22.0.2/dgraph-checksum-linux-amd64.sha256
 		dgraph=$(cat /tmp/"$checksum_file")
 	fi
