@@ -173,14 +173,14 @@ printf "%b" "$RESET"
 		exit 1;
 	fi
 
-  if grep -Fxq "$install_path"/dgraph /tmp/"$checksum_file"
-  then
-      # for versions < 22, old team was hardcoding install paths in SHA file
-      dgraph=$(grep -m 1 "$install_path"/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
-  else
-      # for versions >= 22, new team does not enforce install paths in SHA file
-      dgraph=$(cat /tmp/"$checksum_file")
-  fi
+	if grep -Fxq "$install_path"/dgraph /tmp/"$checksum_file"
+	then
+		# for versions < 22, old team was hardcoding install paths in SHA file
+		dgraph=$(grep -m 1 "$install_path"/dgraph  /tmp/"$checksum_file" | grep -E -o '[a-zA-Z0-9]{64}')
+	else
+		# for versions >= 22, new team does not enforce install paths in SHA file
+		dgraph=$(cat /tmp/"$checksum_file")
+	fi
 
 	if [ "$dgraph" == "" ]; then
 	     print_error "Sorry, we don't have binaries for this platform. Please build from source."
