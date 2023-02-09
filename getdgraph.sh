@@ -311,7 +311,7 @@ setup_systemD() {
 	gen "dgraph.io Alpha instance" \
 		"Requires=dgraph-zero.service" \
 		"" \
-		"dgraph alpha --lru_mb 2048 -p /var/lib/dgraph/p -w /var/lib/dgraph/w" \
+		"dgraph alpha -p /var/lib/dgraph/p -w /var/lib/dgraph/w" \
 		"dgraph-zero.service" \
 		$systemdPath/dgraph-alpha.service
 
